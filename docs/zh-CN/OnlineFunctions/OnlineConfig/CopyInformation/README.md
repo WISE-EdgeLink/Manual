@@ -1,0 +1,3 @@
+- [返回上一级 [OnlineConfig]](zh-CN/OnlineFunctions/OnlineConfig/)
+- [CopyInformation](zh-CN/OnlineFunctions/OnlineConfig/CopyInformation/)
+  - [copyinformation](zh-CN/OnlineFunctions/OnlineConfig/CopyInformation/copyinformation.md)

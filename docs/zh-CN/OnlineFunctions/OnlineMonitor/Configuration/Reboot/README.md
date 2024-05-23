@@ -1,0 +1,3 @@
+- [返回上一级 [Configuration]](zh-CN/OnlineFunctions/OnlineMonitor/Configuration/)
+- [Reboot](zh-CN/OnlineFunctions/OnlineMonitor/Configuration/Reboot/)
+  - [Reboot](zh-CN/OnlineFunctions/OnlineMonitor/Configuration/Reboot/Reboot.md)

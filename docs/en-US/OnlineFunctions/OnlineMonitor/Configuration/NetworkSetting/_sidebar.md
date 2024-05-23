@@ -1,0 +1,6 @@
+- [返回上一级 [Configuration]](en-US/OnlineFunctions/OnlineMonitor/Configuration/)
+- [NetworkSetting](en-US/OnlineFunctions/OnlineMonitor/Configuration/NetworkSetting/)
+  - [Celluar](en-US/OnlineFunctions/OnlineMonitor/Configuration/NetworkSetting/Celluar.md)
+  - [LAN](en-US/OnlineFunctions/OnlineMonitor/Configuration/NetworkSetting/LAN.md)
+  - [Network](en-US/OnlineFunctions/OnlineMonitor/Configuration/NetworkSetting/Network.md)
+  - [Wifi](en-US/OnlineFunctions/OnlineMonitor/Configuration/NetworkSetting/Wifi.md)

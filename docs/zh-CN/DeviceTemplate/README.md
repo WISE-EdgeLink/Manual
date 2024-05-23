@@ -1,0 +1,4 @@
+- [返回上一级 [zh-CN]](zh-CN/)
+- [DeviceTemplate](zh-CN/DeviceTemplate/)
+  - [DeviceTemplate](zh-CN/DeviceTemplate/DeviceTemplate.md)
+  - [TagTemplate](zh-CN/DeviceTemplate/TagTemplate.md)
