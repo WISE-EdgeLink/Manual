@@ -1,0 +1,8 @@
+- [返回上一级 [工程管理扩展功能]](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/)
+- [模板](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/)
+  - [功能模板](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/功能模板/)
+    - [TreeNode](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/功能模板/TreeNode.md)
+  - [设备模板](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/设备模板/)
+    - [DeviceTemplate](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/设备模板/DeviceTemplate.md)
+  - [预设tag点](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/预设tag点/)
+    - [TagTemplate](zh-CN/EdgeLinkStudio/工程管理/工程管理扩展功能/模板/预设tag点/TagTemplate.md)

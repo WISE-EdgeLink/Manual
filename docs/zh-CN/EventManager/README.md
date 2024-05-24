@@ -1,3 +1,0 @@
-- [返回上一级 [zh-CN]](zh-CN/)
-- [EventManager](zh-CN/EventManager/)
-  - [EventManager](zh-CN/EventManager/EventManager.md)

@@ -1,0 +1,3 @@
+- [返回上一级 [网关管理]](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/)
+- [删除网关](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/删除网关/)
+  - [delete](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/删除网关/delete.md)

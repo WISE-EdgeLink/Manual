@@ -1,3 +1,0 @@
-- [返回上一级 [zh-CN]](zh-CN/)
-- [UserRole](zh-CN/UserRole/)
-  - [ChangePassword](zh-CN/UserRole/ChangePassword.md)

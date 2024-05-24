@@ -1,3 +1,0 @@
-- [返回上一级 [OnlineConfig]](zh-CN/OnlineFunctions/OnlineConfig/)
-- [Upload](zh-CN/OnlineFunctions/OnlineConfig/Upload/)
-  - [Upload](zh-CN/OnlineFunctions/OnlineConfig/Upload/Upload.md)

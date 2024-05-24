@@ -1,3 +1,0 @@
-- [返回上一级 [OnlineMonitor]](zh-CN/OnlineFunctions/OnlineMonitor/)
-- [OnlineDataLogger](zh-CN/OnlineFunctions/OnlineMonitor/OnlineDataLogger/)
-  - [DataLogger](zh-CN/OnlineFunctions/OnlineMonitor/OnlineDataLogger/DataLogger.md)

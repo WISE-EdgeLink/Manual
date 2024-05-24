@@ -1,5 +1,0 @@
-- [返回上一级 [zh-CN]](zh-CN/)
-- [Advance](zh-CN/Advance/)
-  - [remote maintenance](zh-CN/Advance/remote%20maintenance.md)
-  - [serial](zh-CN/Advance/serial.md)
-  - [TCP](zh-CN/Advance/TCP.md)

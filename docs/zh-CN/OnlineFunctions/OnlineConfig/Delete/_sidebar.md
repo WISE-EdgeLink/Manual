@@ -1,3 +1,0 @@
-- [返回上一级 [OnlineConfig]](zh-CN/OnlineFunctions/OnlineConfig/)
-- [Delete](zh-CN/OnlineFunctions/OnlineConfig/Delete/)
-  - [delete](zh-CN/OnlineFunctions/OnlineConfig/Delete/delete.md)
