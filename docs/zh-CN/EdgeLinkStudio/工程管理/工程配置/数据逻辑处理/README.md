@@ -1,8 +1,0 @@
-- [返回上一级 [工程配置]](zh-CN/EdgeLinkStudio/工程管理/工程配置/)
-- [数据逻辑处理](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/)
-  - [KW设置](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/KW设置/)
-    - [KWSetting](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/KW设置/KWSetting.md)
-  - [事件管理](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/事件管理/)
-    - [EventManager](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/事件管理/EventManager.md)
-  - [数据传送](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/数据传送/)
-    - [DataTransfer](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据逻辑处理/数据传送/DataTransfer.md)

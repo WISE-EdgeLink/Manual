@@ -1,3 +1,0 @@
-- [返回上一级 [网络和Internet]](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/网络和Internet/)
-- [NAT设置](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/网络和Internet/NAT设置/)
-  - [NAT](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/网络和Internet/NAT设置/NAT.md)

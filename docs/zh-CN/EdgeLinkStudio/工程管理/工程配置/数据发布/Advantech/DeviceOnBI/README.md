@@ -1,3 +1,0 @@
-- [返回上一级 [Advantech]](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advantech/)
-- [DeviceOnBI](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advantech/DeviceOnBI/)
-  - [WISE.M+](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advantech/DeviceOnBI/WISE.M+.md)

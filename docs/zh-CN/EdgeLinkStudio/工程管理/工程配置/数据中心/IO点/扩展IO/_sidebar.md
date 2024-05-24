@@ -1,5 +1,0 @@
-- [返回上一级 [IO点]](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/)
-- [扩展IO](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/扩展IO/)
-  - [ExtensionCard](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/扩展IO/ExtensionCard.md)
-  - [ExtensionConfiguration](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/扩展IO/ExtensionConfiguration.md)
-  - [ExtensionIO](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/扩展IO/ExtensionIO.md)

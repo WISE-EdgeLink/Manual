@@ -1,3 +1,0 @@
-- [返回上一级 [连接设置]](zh-CN/EdgeLinkStudio/工程管理/工程配置/连接设置/)
-- [虚拟串口](zh-CN/EdgeLinkStudio/工程管理/工程配置/连接设置/虚拟串口/)
-  - [VCOM](zh-CN/EdgeLinkStudio/工程管理/工程配置/连接设置/虚拟串口/VCOM.md)

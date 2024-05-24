@@ -1,3 +1,0 @@
-- [返回上一级 [添加网关]](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/)
-- [从已有网关拷贝](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/从已有网关拷贝/)
-  - [Copy](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/从已有网关拷贝/Copy.md)

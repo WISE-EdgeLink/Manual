@@ -1,3 +1,0 @@
-- [返回上一级 [IO点]](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/)
-- [板载IO](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/板载IO/)
-  - [OnboardIO](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据中心/IO点/板载IO/OnboardIO.md)

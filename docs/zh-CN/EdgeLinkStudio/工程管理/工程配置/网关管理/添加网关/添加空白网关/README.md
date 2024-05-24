@@ -1,3 +1,0 @@
-- [返回上一级 [添加网关]](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/)
-- [添加空白网关](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/添加空白网关/)
-  - [blank](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/添加网关/添加空白网关/blank.md)

@@ -1,3 +1,0 @@
-- [返回上一级 [系统设置]](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/)
-- [系统服务设置](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/系统服务设置/)
-  - [ServiceControl](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/系统服务设置/ServiceControl.md)

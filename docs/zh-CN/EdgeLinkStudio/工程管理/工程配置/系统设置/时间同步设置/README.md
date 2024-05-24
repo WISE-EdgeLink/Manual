@@ -1,3 +1,0 @@
-- [返回上一级 [系统设置]](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/)
-- [时间同步设置](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/时间同步设置/)
-  - [TimeSync](zh-CN/EdgeLinkStudio/工程管理/工程配置/系统设置/时间同步设置/TimeSync.md)

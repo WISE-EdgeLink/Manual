@@ -1,3 +1,0 @@
-- [返回上一级 [网关管理]](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/)
-- [复制网关](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/复制网关/)
-  - [samecopy](zh-CN/EdgeLinkStudio/工程管理/工程配置/网关管理/复制网关/samecopy.md)
