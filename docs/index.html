@@ -15,9 +15,6 @@
   </head>
   <body>
     <div id="app"></div>
-	<!-- 语言切换按钮 -->
-  <button id="switch-zh">中文</button>
-  <button id="switch-en">English</button>
     <script>  
       window.$docsify = {
         name: "EdgeLink",
@@ -113,22 +110,6 @@
 
       <!-- emoji -->
       <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
-	  <script>
-    // 获取当前页面的路由信息
-    const currentPath = window.location.pathname;
-    const defaultPath = currentPath.includes('/zh-cCN/') ? '/zh-CN/' : '/en-US/';
-    
-    // 切换到中文
-    document.getElementById('switch-zh').addEventListener('click', () => {
-      const newPath = currentPath.replace('/en-US/', '/zh-CN/');
-      window.location.pathname = newPath;
-    });
-
-    // 切换到英文
-    document.getElementById('switch-en').addEventListener('click', () => {
-      const newPath = currentPath.replace('/zh-CN/', '/en-US/');
-      window.location.pathname = newPath;
-    });
-  </script>
+	  
   </body>
 </html>
