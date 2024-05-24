@@ -11,27 +11,29 @@
     <!-- 文件夹样式 -->
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar-folder.min.css" />
     <!-- 箭头样式 -->
-    <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar.min.css" />-->
+    <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar.min.css" /> -->
   </head>
   <body>
     <div id="app"></div>
     <script>  
       window.$docsify = {
-        name: "EdgeLink",
+        name: "Blog",
         // 侧边栏文档目录
         loadSidebar: true,
-		subMaxLevel: 2,
+
+        subMaxLevel: 2,
         alias: {
           "/.*/_sidebar.md": "/_sidebar.md",
         },
         // 跳转后自动到顶部
         auto2top: true,
+
         coverpage: true,
         // PLUGINS
         // ----------------------------------------------------------------
         // 页面右侧toc
         toc: {
-          tocMaxLevel: 6,
+          tocMaxLevel: 2,
           target: "h2, h3, h4, h5, h6",
         },
 
@@ -111,6 +113,5 @@
 
       <!-- emoji -->
       <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
-	  
   </body>
 </html>
