@@ -224,8 +224,7 @@
           - [微软云](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/微软云/Azure.md)
           - [普奥云](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/普奥云/ProudSmart.md)
           - [百度云](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/百度云/Baidu.md)
-          - [阿里云](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/阿里云/Aliyun.md)
-          
+          - [阿里云](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/阿里云/Aliyun.md)        
         - [数据存储](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据存储/)
           - [数据备份](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据存储/数据备份/RemoteBackup.md)
           - [数据记录](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据存储/数据记录/DataLogger.md)
