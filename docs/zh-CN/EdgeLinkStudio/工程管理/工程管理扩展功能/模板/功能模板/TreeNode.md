@@ -1,4 +1,4 @@
-## 功能模板
+# 功能模板
 
 Utility的工程树中支持的节点类型会保存在deviceInfo.xml文件的TreeNodeTypes元素中。
 
@@ -14,7 +14,7 @@ Utility的工程树中支持的节点类型会保存在deviceInfo.xml文件的Tr
 
 ---
 
-### 功能树结构
+## 功能树结构
 
 在deviceInfo.xml文件中表示每种设备类型的Node元素下，包含TreeNode元素描述功能树结构。Utility依照此结构创建每种设备的功能树。
 
