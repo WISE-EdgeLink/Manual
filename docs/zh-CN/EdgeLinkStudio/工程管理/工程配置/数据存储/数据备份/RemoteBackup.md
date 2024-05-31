@@ -1,4 +1,4 @@
-## 数据备份 ##
+# 数据备份
 
 在EdgeLink Studio中用户可以设置对指定的点的历史数据进行存储，根据设置的存储方式，历史数据将占用SD卡或U盘中的部分空间，随着运行时间的增加，历史数据也会越来越多。为提高历史数据备份性能和安全性，用户可以将庞大的数据备份到其他服务器上。
 
@@ -18,13 +18,13 @@
 
 7.点击应用，完成配置。
 
-目前数据备份按使用服务器类型不同，分为SQL Server和FTP Server两种：
+目前数据备份按使用服务器类型不同，分为SQL Server、MySQL Server、FTP Server三种：
 
 ![](remotebackup_type.png)
 
 当连接下的备份列表中已经添加了要备份的内容（如Tag点）后，服务器类型不可修改；删除备份列表中的所有内容后，可以修改服务器类型。
 
-###SQL Server方式###
+## SQL Server方式
 
 在数据备份设置区域中，选择“服务器类型”为“SQL Server”，即可按ODBC方式备份所选点数据。需要填写的信息包括：
 
@@ -64,7 +64,7 @@ Tag点存储值类型即存储数据的格式，默认值类型为float，可选
 
 ![](remotebackup_selecttag_warning.png)
 
-###MySQL Server方式###
+## MySQL Server方式
 
 在数据备份设置区域中，选择“服务器类型”为“MySQL Server”，即可按MySQL Server方式备份所选点数据。需要填写的信息与“SQL Server”一致。
 
@@ -96,7 +96,7 @@ Tag点存储值类型即存储数据的格式，默认值类型为float，可选
 此版界面并没有可自定义配置用于存储每个tag最后成功上传的时间戳的table。设备连接数据库时会默认创建FORRECORDTIME 表用于存储tag最后上传的时间戳，用于设备断点续传功能。
 
 
-###FTP Server方式###
+## FTP Server方式
 
 在数据备份设置区域中，选择“服务器类型”为“FTP Server”，即可按FTP方式备份所选点数据。需要填写的信息包括：
 
