@@ -14,8 +14,8 @@ DeviceOn/BI数据使用子设备模型上传数据。子设备的名称以Tag点
 
 ### 其他配置说明
 
-[点表配置说明](./others/TagList_Setting.html)   
+[点表配置说明](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advance/TagList_Setting.md)   
 
-[断点续传配置说明](./others/resume.html)
+[断点续传配置说明](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advance/resume.md)
 
-[点表导入导出配置说明](./others/excel.html)
+[点表导入导出配置说明](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advance/excel.md)

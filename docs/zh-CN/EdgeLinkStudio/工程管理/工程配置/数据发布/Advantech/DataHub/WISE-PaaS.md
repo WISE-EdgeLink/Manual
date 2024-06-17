@@ -1,13 +1,12 @@
-
-## WISE-PaaS/DataHub
+# WISE-PaaS/DataHub
 
 &emsp;&emsp;EdgeLink中的WISE-PaaS云服务插件支持与WISE-PaaS/DataHub连接，支持Plug&Play设备配置数据上传，不支持从DataHub修改设备配置。从EdgeLink_v2.2.0开始支持。
 
-###1. 快速连接
+## 1. 快速连接
 
 &emsp;&emsp;建立上传周期为5s的周期上传连接，以此为例说明EdgeLink与WISE-Paas/DataHub连接建立及验证操作过程；其他设置项查看[Edgelink工程配置说明详解](#jump1)。
 
-(1) 获取WISE-PaaS/DataHub连接信息
+### (1) 获取WISE-PaaS/DataHub连接信息
 
 - WISE-Paas/DataHub添加Project；
 - Project里添加Node，添加Node会生成`DataHub ID`，`Credential Key`和`DCCS API Url`；
@@ -18,7 +17,7 @@
 
 ![](WISE-PaaS_nodeid.png)
 
-(2) 设置EdgeLink工程
+### (2) 设置EdgeLink工程
 
 - 双击EdgeLink Studio 工程配置界面左侧云服务里的WISE-Paas/DataHub，配置WISE-Paas/DataHub_0；
 - 启用连接；
@@ -33,14 +32,14 @@
 
 - 其他连接参数保持默认。
 
-(3) 验证连接成功
+### (3) 验证连接成功
 
 - 下载EdgeLink工程；
 - 重启成功后，WISE-PaaS/DataHub界面可看到实时数据，EdgeLink连接WISE-PaaS/DataHub并上传数据成功。
 
 ![](WisePaas_data.png)
 
-###2. 注意事项
+## 2. 注意事项
 
 - 检查EdgeLink硬件设备时间，设备时间与服务器时间需要一致
 
@@ -51,7 +50,7 @@
 - 如果服务器证书过期，需要更新证书，请联系WISE-PaaS维护人员
 
 
-###<span id="jump1">3. EdgeLink工程配置说明详解</span>
+## <span id="jump1">3. EdgeLink工程配置说明详解</span>
 
 | 参数 | 参数说明 |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------|
@@ -75,7 +74,7 @@
 |`变化上传`|变化上传模式：启用，不启用和控制点控制上传|
 |`变化上传控制点`|选择变化上传控制点。点值为非0时上传数据；点值为0时不上传数据|
 |`检测周期`|点变化的检测周期|
-|`检测变化`|选择检测点的哪些参数变化，可选的参数包括点值、质量和时间戳。tag点值的变化检测会受到在tag点表中配置的阈值类型、阈值宽度和抖动时间这三个参数的影响，详见[tag点表配置说明](./others/TagList_Setting.html)|
+|`检测变化`|选择检测点的哪些参数变化，可选的参数包括点值、质量和时间戳。tag点值的变化检测会受到在tag点表中配置的阈值类型、阈值宽度和抖动时间这三个参数的影响，详见[tag点表配置说明](zh-CN/EdgeLinkStudio/工程管理/工程配置/数据发布/Advance/TagList_Setting.md)|
 |`重连后发布所有点`|EdgeLink与云端建立连接时是否将当前所有的点的值上传一次到云端，使能发送不使能不发送，默认使能|
 |`启用断点续传`|断点续传的启用开关|
 |`断点前数据`|默认0，从断线前n秒开始续传数据|
@@ -88,9 +87,9 @@
 |`SCADA Name`|无子设备配置时以此做为WISE-PaaS/DataHub中的设备名称，选填项，不填写时，将会使用工程中配置的网关节点名称作为设备名称|
 |`Bad Quality Tag`|Tag Quality不为0（GOOD）的上传模式：Pub * once; Pub * always; Still pub value; Don't pub|
 
-###4. 进阶操作
+## 4. 进阶操作
 
-####4.1 断点续传
+### 4.1 断点续传
 
 - 前提条件：必须将需要断点续传的点配置到DataLogger进行本地存储，设备必须有存储卡，存储设置参考数据存储说明
 
@@ -102,7 +101,7 @@
 
 - 工程配置下载生效后，如设备运行期间有与WISE-PaaS/DataHub断开的情况，重连后则会进行数据续传。
 
-####4.2 隐藏参数
+### 4.2 隐藏参数
 
 修改studio安装目录下配置文件：
 C:\Program Files (x86)\Advantech\EdgeLink Studio\Resources\Cloud\armv7-linux-gcc\common\WISE-PaaS.xml可开放参数
@@ -120,7 +119,7 @@ C:\Program Files (x86)\Advantech\EdgeLink Studio\Resources\Cloud\armv7-linux-gcc
 |`Publish Ctrl`|参数名：x_pub_limit 可选值：None（=0）, DOn/DOf（=1） 默认值：None，此选项用于选择是否使用DOn/DOf命令控制数据发布，仅用于Webaccess |
 |`Timestamp`|参数名：x_local_time 可选值：UTC Time（=0）, Local Time（=1） 默认值：UTC Time，此选项用于设置时间戳的时区。|
 
-####4.3 设置多个连接
+### 4.3 设置多个连接
 
 同类型云连接可以设置多个，点击连接标签页右边的加号可以添加，最多4个，连接的总个数应用后会显示在列表。
 
@@ -152,15 +151,22 @@ WISE-PaaS/DataHub支持使用子设备模型上传数据。Edgelink子设备模�
 设置子设备后，会在WISE-PaaS/DataHub的Device list界面显示子设备名称，子设备里会有分属自己的点数据。
 
 
-###5. 调试手段
+## 5. 调试手段
 
 - 查看系统日志，方法有三种：
+
 （1）查看EdgeLink studio在线监控中的系统日志信息
+
 （2）命令行使用指令`tail -F /var/log/messages`查看系统日志
+
 （3）如有查看更多关于云服务连接的日志，可操作手动启动MQTTClient程序，命令行使用指令
+
 `killall AdvProgramMgr`
+
 `killall MQTTClient`
+
 `MQTTClient -log TRACE`
+
 上述调试操作结束后，需要恢复程序运行状态，命令行执行指令
 `AdvProgramMgr -d`
 
