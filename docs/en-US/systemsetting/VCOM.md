@@ -1,4 +1,4 @@
-> VCOM Manager Setup File download link: [https://www.advantech.tw/support/details/utility?id=1-24KJ5E7](https://www.advantech.tw/support/details/utility?id=1-24KJ5E7)
+> VCOM Manager Setup File download link: [VCOM Utility](https://www.advantech.tw/support/details/utility?id=1-24KJ5E7){target="_blank"}
 
 
 
@@ -26,7 +26,7 @@ The VCOM function on the gateway is disabled by default. It can be enabled throu
 
 ### 3. VCOM Management Program
 
-The VCOM management program is an independent installation package. You can download the setup file from this site: [https://www.advantech.tw/support/details/utility?id=1-24KJ5E7](https://www.advantech.tw/support/details/utility?id=1-24KJ5E7).
+The VCOM management program is an independent installation package. You can download the setup file from this site: [VCOM Utility](https://www.advantech.tw/support/details/utility?id=1-24KJ5E7){target="_blank"}.
 
 After the installation is complete, you can find the shortcut of the `Advantech EdgeLink VCOM Manager` program in the startup item of the system start menu, as shown in the figure below.
 

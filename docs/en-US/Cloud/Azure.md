@@ -11,7 +11,7 @@ Since v2.8.1, the bottom layer of EdgeLink uses the Microsoft Azure IoT SDK to c
 
 If you are using this plugin in the environment of an IoT Edge-launched EdgeLink Container, you do not have to enable resumable uploads, as IoT Edge will cache the transferred data.
 
-This plugin supports the following [Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods), please note that method names are case sensitive.
+This plugin supports the following [Direct Method](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-direct-methods){target="_blank"}, please note that method names are case sensitive.
 
 ### 1. GetVersion - Get EdgeLink version information
 
@@ -25,7 +25,7 @@ Example of return value when the call is successful:
 ````json
 {
 	"Result": "Success",
-	"Content": "ADAM-3600-C2GL1A1E Standard Edition image version 2.8.0 Release Dec 29 2021"
+	"Content": "ADAM-3600-C2GL1 Standard Edition image version 2.8.0 Release Dec 29 2021"
 }
 ````
 
@@ -126,7 +126,7 @@ Example of return value when the call fails:
 
 ### Others
 
-[Tag List](./others/TagList_Setting.html)   
+[Tag List](./others/TagList_Setting.html)
 
 [resume](./others/resume.html)
 

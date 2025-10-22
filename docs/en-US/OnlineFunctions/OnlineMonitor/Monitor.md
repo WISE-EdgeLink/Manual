@@ -14,4 +14,5 @@ There are mainly the following functions:　
 5. System Log： system information
 
 
-Note: Third-party clients are supported to access through RESTful API, download link of API specification document:[Open RESTFul API Specification](http://support.advantech.com/Support/DownloadSRDetail_New.aspx?SR_ID=1-1KPLJQG&Doc_Source=Download)
+Note: Third-party clients are supported to access through RESTful API, download link of API specification document:[Open RESTFul API Specification](https://www.advantech.com.cn/zh-cn/support/details/software-api?id=1-1KPLJQG){target="_blank"}
+

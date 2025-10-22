@@ -1,75 +1,188 @@
-
-
 ## Custom MQTT
 
-Custom MQTT provides a customized topic / payload scheme in which topic / payload can be defined by the user to test and verify MQTT data communications or to be applied to cloud services that require customized development.
-In addition to tag data upload and modification, Custom MQTT also supports the ability of the server to deliver messages of a specific topic to perform the specified commands for special application extensions.
+Custom MQTT provides a customizable topic/payload scheme, where the topic and payload can be defined by the user. This is useful for testing MQTT data communication or for cloud services that require custom payloads.
+
+In addition to tag data upload and modification, Custom MQTT also supports receiving messages from specific topics issued by the server to execute specified commands, allowing for extended use in special applications.
 
 ---
-### Parameter settings
 
-![](CustomMQTT_1.png)
+### Parameter Settings
 
-- **Data Topic**: Required fields that specify topics for publishing real-time data. To facilitate parsing of data packets from different devices on the cloud server, it is recommended to add the device unique identifier to the topic when setting this topic.
-- **Data Payload**: Required fields that specify payload for publishing real-time data.
+<img src="CustomMQTT_1.png" title="" alt="" data-align="center">
 
-    [Payload Configuration instructions](../resume/Libextext.html)
+- **Gateway Name**:
 
-- **Resume Topic**: Optional, specifies the topic for publishing resuming data. If this field is not set, then the topic specified in `Data Topic` will be used.
+	Optional. Used in data publishing templates with sub-device models. If the point name cannot be resolved to a sub-device name, this value will be used as the sub-device name. If not specified and needed, `_DEFAULT_DEV_NAME_` will be used.
 
-- **Resume payload**: Optional, specifies the payload for publishing resuming data. If this field is not set, then the load specified in `Data Payload` will be used.
+- **Data Topic**:
 
-    [Payload Configuration instructions](../resume/Libextext.html)
+	Required. Specifies the topic for publishing real-time data. It's recommended to include a unique device identifier in the topic to aid parsing on the cloud server.
 
-- **Command Topic**: Optional, specifies the subject to receive the command. Publishing data from the cloud server to the topic can modify the tag value on the device. The format of the data is as follows. Tags and Tags value are defined by the user. There can be no timestamp data in the write packet (that is, ts). If this field is not filled in, the device will not accept the command to modify the value of the cloud service.
+- **Data Payload**:
 
-   The example of modifying the value of a packet is as follows: The following packet will write the value of AO\_1 as 12.88 and the value of AO\_2 as 18.76.
+	Required. Specifies the payload format for publishing real-time data.
 
-   ```json
-   {
-       "w":[
-           {
-               "tag":"AO_1",
-               "value":12.88
-           },
-           {
-               "tag":"AO_2",
-               "value":18.76
-           }
-       ],
-       "ts":"2017-12-28T12:22:21+0000"
-   }
-   ```
-  
-- **Compress Payload**: This option controls whether to use GZIP to compress the message payload. By default, the payload is not compressed. If this option is set to GZIP compression, you must make sure that the cloud platform also uses the same GZIP method for decompression. At the same time, the `cmd` payload must also be GZIP compressed message content.
+	[Payload Configuration Guide](../resume/Libextext.html)
 
-- **QoS**: This option is used to control the quality of service used when publishing messages. The default value is QoS 1.
+- **Resume Topic**:
 
-   * `QoS 0`: Distributed at most once, the distribution of messages depends on the capabilities of the underlying network. The recipient will not send a response and the sender will not retry. The message may or may not be delivered at all.
-   * `QoS 1`: Distribute at least once, the quality of service ensures that the message is delivered at least once.
-   * `QoS 2`: Distribute only once, which is the highest level of quality of service, and message loss and duplication are unacceptable. There is an additional overhead in using this quality of service level.
+	Optional. Specifies the topic for publishing resume (breakpoint continuation) data. If not set, `Data Topic` will be used.
 
-- **External Topic**: This option is used to set the topic for external command. If set, the device will subscribe this topic, and will execute the command specified in "External Command" when the message arrived. 
+- **Resume Payload**:
 
-- **External Command**: This option is used combined with the "External Topic", to specify the command line to be executed when message arrived.
-For example: `logger %p`, this command will output the message payload to syslog when it is executed。<br>
-The command line can have arguments, the following patterns supported in the command line:
+	Optional. Specifies the payload format for resume data. If not set, `Data Payload` will be used.
 
-	* %t: Topic, this pattern will be substitute by the topic when executing.
-	* %p: Payload, this pattern will be substitute by the payload when executing.
-	* %pf: Payload file, this pattern will be substitute by a file contains the payload when executing.
+	[Payload Configuration Guide](../resume/Libextext.html)
 
-	> Note: Don't use `newline` or one of `|, &, ;, <, >, (, ), {, }` in the command string,
-	and because of the MQTT application is running as unprivileged user, please don't specify any command needs to run in privileged mode.
+- **[N].Topic**<br>**[N].Payload**<br>**[N].Topic R**<br>**[N].Payload R**:
 
-- **Will Topic**: Optional, specifies the topic for publishing will message.
+	Optional. N ranges from 1 to 25, indicating 25 configurable topic-payload groups:
 
-- **Will message**: Optional, specifies the content for publishing will message.
+	- **[N].Topic**: Real-time data topic
+	- **[N].Payload**: Real-time data payload format
+	- **[N].Topic R**: Resume data topic
+	- **[N].Payload R**: Resume data payload format
 
-### Others
+- **Command Topic**:
 
-[Tag List](./others/TagList_Setting.html)   
+	Optional. Topic for receiving commands. The cloud server can send messages to this topic to modify tag point values on the device. Supported message format example:
 
-[resume](./others/resume.html)
+	```json
+	{
+		"w":[
+			{
+				"tag":"AO_1",
+				"value":12.88
+			},
+			{
+				"tag":"AO_2",
+				"value":18.76
+			}
+		],
+		"ts":"2017-12-28T12:22:21+0000"
+	}
+	```
 
-[export/import](./others/excel.html)
+	If this format is not usable, `Write Names Rule` and `Write Values Rule` using [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) can be configured.
+
+	For assistance, use [https://jsonpath.com](https://jsonpath.com).
+
+- **Write Names Rule**
+
+	JSONPath rule to extract tag names. Default is `$..tag`. Should return an array of strings. To combine sub-device and tag names: e.g. `$..device;$..name`.
+
+	```json
+	[{
+		"device": "PLC1",
+		"data": [{
+			"name": "Status",
+			"value": 1
+		},{
+			"name": "Flags",
+			"value": 88
+		},{
+			"name": "PV",
+			"value": 123
+		}]
+	},{
+		"device": "PLC2",
+		"data": [{
+			"name": "Status",
+			"value": 0
+		},{
+			"name": "PV",
+			"value": 456
+		}]
+	}]
+	```
+
+	For keys as device names, use `~` in JSONPath: e.g. `$[*].*~;$..name`
+
+	```json
+	[{
+		"PLC1": [{
+			"name": "Status",
+			"value": 1
+		},{
+			"name": "Flags",
+			"value": 88
+		},{
+			"name": "PV",
+			"value": 123
+		}]
+	},{
+		"PLC2": [{
+			"name": "Status",
+			"value": 0
+		},{
+			"name": "PV",
+			"value": 456
+		}]
+	}]
+	```
+
+- **Write Values Rule**
+
+	JSONPath rule for extracting values. Default is `$..value`. Must produce a flat array of primitive types and match length with tag names.
+
+- **Compress Payload**:
+
+	Enables GZIP compression for payloads. Ensure cloud server also supports GZIP for both sent and received messages.
+
+- **QoS**:
+
+	Controls QoS level (default: 1).
+
+	* QoS 0: At most once. No response or retries.
+	* QoS 1: At least once. Ensures delivery.
+	* QoS 2: Exactly once. Most reliable but most overhead.
+
+- **External Topic**:
+
+	Topic subscribed to receive external commands.
+
+- **External Command**:
+
+	Command to execute when a message is received on External Topic. E.g., `logger %p` logs payload.
+
+	Wildcards:
+	* %t: topic
+	* %p: payload string
+	* %pf: payload saved to file
+
+	Avoid unsafe characters and commands needing root.
+
+- **Will Topic**:
+
+	Optional. Topic for last will message.
+
+- **Will Message**:
+
+	Optional. Content of last will message.
+
+- **Fault Value**:
+
+	Value to upload when tag quality is bad (default: `*`).
+
+- **RETAIN Flag**:
+
+	Publish RETAIN flag options:
+
+	- None
+	- For periodic pub
+	- For diff pub
+	- For periodic & diff pub
+
+**From version 2.8.4.1, multiple TagLists are supported with individual upload settings.**
+
+- Upload all points after reconnect
+- Skip bad quality points
+- Upload all points on change
+
+### Other Configuration Guides
+
+[Tag List Configuration](./others/TagList_Setting.html)
+
+[Resume Configuration](./others/resume.html)
+
+[Import/Export Tags](./others/excel.html)

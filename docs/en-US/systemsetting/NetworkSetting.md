@@ -132,9 +132,9 @@ On ADAM-3600-D1GL1 and other devices with dual network card functions, in additi
 3. Configure the switch mode of the network card
 
     - No switching: No network card switching during operation
-    
+
     - Tag value control: Use the tag value to control the switch of the network card. When the value is 1, switch to the network card 1, and when the value is 2, switch to the network card 2.The rest will not be switched.
-    
+
     - Check the connection: Switch the network card according to the connection judgment mechanism, and switch the network card when the network connection fails.
 
 ----
@@ -166,7 +166,7 @@ After loading this page, these three files will be downloaded to EdgeLink when t
 
 ![](OpenVPN_Username.png)
 
-When using the user name and password to connect to the OpenVPN server, the CA file generated on the server is also required. 
+When using the user name and password to connect to the OpenVPN server, the CA file generated on the server is also required.
 It also requires the username and password assigned on the server.
 
 ##### TLS Authentication
@@ -236,6 +236,8 @@ Users need to fill in the PPPOE user name and password, select the authenticatio
 #### Network Bridge Settings
 
 Network card bridge setting is supported on EdgeLink non-UNO and WISE710 Linux platforms. Set the network card bridge settings in "System Settings"-"Network and Internet"-"Network Settings"-"Bridge".
+
+After enabling the bridging function, a new virtual network interface card (NIC) will be created, named br0. The configuration information for the br0 virtual NIC is as follows. Network interfaces associated with this bridge, such as eth0, will no longer be configurable in the system. After the configuration is successfully completed, the device will communicate with the external network through the br0 NIC.
 
 ![](NetworkSetting_Bridge.png)
 

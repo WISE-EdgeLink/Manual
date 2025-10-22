@@ -12,7 +12,7 @@ The general scenario involves a network connection (such as VPN) between the PC 
 
 ![](./VCOM_2.png)
 
-2. Install the VCOM management program on the PC (control center). The download link for the VCOM management program installation package is: https://www.advantech.tw/support/details/utility?id=1-24KJ5E7. You can download the installation package that starts with "SetupEdgeLinkVCOM".
+2. Install the VCOM management program on the PC (control center). The download link for the VCOM management program installation package is: [VCOM Utility](https://www.advantech.tw/support/details/utility?id=1-24KJ5E7){target="_blank"}. You can download the installation package that starts with "SetupEdgeLinkVCOM".
 
 3. Virtualize the gateway's serial port to the PC (control center) using the VCOM management program. For example, if COM1 of Gateway 1 is connected to PLC1 and you want to configure this PLC, bind COM1 of Gateway 1 to the VCOM management program. At this point, you can see the virtualized serial port and its port number in the VCOM management program.
 

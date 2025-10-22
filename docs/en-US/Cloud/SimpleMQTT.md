@@ -21,7 +21,8 @@ The default simple MQTT publishing data payload format is as follows:
             "quality":0
         }
     ],
-    "ts":"2017-12-22T08:05:20+0000"
+    "ts":"2017-12-22T08:05:20+0000",
+    "type":0
 }
 ```
 - Among them
@@ -35,8 +36,9 @@ The default simple MQTT publishing data payload format is as follows:
 | Quality | tag current quality value (selectable via parameter switch) |
 
 - "ts" is the timestamp of the message and follows the ISO 8601 standard.
+- "type" identifies whether the current message is a periodic publish (0) or a change publish (1).
 
-> The data retransmission of the disconnected SimpleMQTT packet is exactly the same as the data packet format of the real-time data.The difference is that the time stamp is obtained from the data record, not the current time.
+> The data retransmission of the disconnected SimpleMQTT packet is the same as the data packet format of the real-time data, except that there is no "type" field. The difference is that the time stamp is obtained from the data record, not the current time.
 
 ---
 ### Parameter settings
@@ -69,10 +71,10 @@ The default simple MQTT publishing data payload format is as follows:
    * `Simple`: The default payload type, no quality field in payload
    * `Simple with quality`: The default payload type with quality field in payload
    * `Compact`: The compact payload type as below.
-   ```
-   {"ts":1451649600512, "values":{"tag1":"value1", "tag2":"value2"}}
-   ```
-  
+        ```json
+        {"ts":1451649600512, "type":0, "values":{"tag1":"value1", "tag2":"value2"}}
+        ```
+
 - **Compress Payload**: This option controls whether to use GZIP to compress the message payload. By default, the payload is not compressed. If this option is set to GZIP compression, you must make sure that the cloud platform also uses the same GZIP method for decompression. At the same time, the `cmd` payload must also be GZIP compressed message content.
 
 
@@ -89,7 +91,7 @@ The default simple MQTT publishing data payload format is as follows:
    * `UNIX Time`: UNIX time stamp format, such as `1600058903`
    * `UNIX Time w/ MS`: UNIX time stamp format with millisecond, such as `1600058903001`
 
-- **External Topic**: This option is used to set the topic for external command. If set, the device will subscribe this topic, and will execute the command specified in "External Command" when the message arrived. 
+- **External Topic**: This option is used to set the topic for external command. If set, the device will subscribe this topic, and will execute the command specified in "External Command" when the message arrived.
 
 - **External Command**: This option is used combined with the "External Topic", to specify the command line to be executed when message arrived.
 For example: `logger %p`, this command will output the message payload to syslog when it is executed。<br>
@@ -104,7 +106,7 @@ The command line can have arguments, the following patterns supported in the com
 
 ### Others
 
-[Tag List](./others/TagList_Setting.html)   
+[Tag List](./others/TagList_Setting.html)
 
 [resume](./others/resume.html)
 

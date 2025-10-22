@@ -27,3 +27,8 @@ In project configuration, users can add and configure IO tags based on the real 
 ![](IOtag.png)
 
 
+![](IOTag_Insert.png)
+
+Insert UP/Insert Down: Insert a tag above or below the currently selected tag
+
+

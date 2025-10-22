@@ -56,3 +56,14 @@ The attributes that users can configure are as follows:
 - Enable: When you select Enable, this configuration will be added to nat.sh.
 - Name: You can choose to support either TCP / UDP or both.
 - External - Interface: Select to allow intranet devices to access the external network through a specific interface of the gateway, or access through all interfaces.
+
+
+#### Example:
+
+![](PF001.png)
+
+![](PF002.png)
+
+![](PF003.png)
+
+![](PF004.png)

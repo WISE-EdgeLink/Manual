@@ -93,13 +93,11 @@ There are two types of system tags：[**General system tag**](#general-system-ta
 
 ### Special system tag description
 
-- **#DATALOG_ENABLE** ：  Read-write, enabling DataLogger storage when the value is 1 and stopping the DataLogger storage when the value is 0  
-- **#DATALOG_ERROR** ：   Read-only, 0--The program runs normally, other error codes need to be found in the DataLogger manual section 
-- **#DISABLE_DEVICE_MeterName** ： Read-write, each meter in the DataCenter has its own tag, distinguished by the name of the meter. 0--meter available, 1--meter not available. For example, if the meter name is Test Device 1, there will be a corresponding system tag #DISABLE_DEVICE_ Test Device 1, through which the meter can be disabled or started 
+- **#DATALOG_ENABLE** ：  Read-write, enabling DataLogger storage when the value is 1 and stopping the DataLogger storage when the value is 0
+- **#DATALOG_ERROR** ：   Read-only, 0--The program runs normally, other error codes need to be found in the DataLogger manual section
+- **#DISABLE_DEVICE_MeterName** ： Read-write, each meter in the DataCenter has its own tag, distinguished by the name of the meter. 0--meter available, 1--meter not available. For example, if the meter name is Test Device 1, there will be a corresponding system tag #DISABLE_DEVICE_ Test Device 1, through which the meter can be disabled or started
 - **#BATCH_WRITE_MeterName** ：  Read-write, each meter in the DataCenter has its own tag, distinguished by the name of the meter. 0--meter single point write, 1--meter batch write. For example, if the name of the meter is testdevice1, there will be a corresponding system point #BATCH_WRITE_ testdevice1, through which the writing method of the meter can be set
 - **#DEVICE_ERROR_MeterName** ：   Read-only, each meter in the DataCenter has its own tag, distinguished by the name of the meter. The error code when the current meter is collecting errors. For example, if the instrument name is TestDevice1, there will be a corresponding system tag #DEVICE_ERROR_TestDevice1, through which the current meter collection status can be viewed
-- **#DISABLE_PORT_PortName** ： Read-write, each port has its own tag, 0--port available, 1-disable port. For example, the COM1 port will have a corresponding system tag #DISABLE_PORT_COM1, through which the port can be turned on or disabled 
-
- 
-
-
+- **#D_SCAN_TIME_MeterName** ： Read-only, each meter in the DataCenter has its own tag, distinguished by the name of the meter. Indicates the actual scanning time of the device in milliseconds.
+- **#DISABLE_PORT_PortName** ： Read-write, each port has its own tag, 0--port available, 1-disable port. For example, the COM1 port will have a corresponding system tag #DISABLE_PORT_COM1, through which the port can be turned on or disabled
+- **#P_SCAN_TIME_PortName** ： Read-only, each port has its own tag. Indicates the actual scan time of the port. Note: When the port uses parallel scan mode, this system point value is meaningless.

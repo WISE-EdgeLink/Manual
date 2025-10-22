@@ -15,11 +15,11 @@ For example, a PC (control center) establishes a network connection with the gat
 
 ![](./TCP002.png)
 
-2. Open the PLC communication software at the control center to configure the PLC.
+2. Open the PLC communication software at the control center to configure the PLC.(Connecting the communication software to 10.0.3.6 will enable the configuration to be pushed down to 192.168.1.4)
 
 ### Scenario 2
 
-When a single Ethernet port of the gateway connects to multiple PLCs (if there are multiple gateways on site, please note: the IP addresses of the PLCs connected under each gateway must not be duplicated), remote operation and maintenance can be achieved using network bridging.
+When a single Ethernet port of the gateway connects to multiple PLCs (if there are multiple gateways on site, please note: the IP addresses of the PLCs connected under each gateway must not be duplicated), remote operation and maintenance can be achieved using network bridging.(Please set the VPN to tap mode)
 
 ![](TCP003.png)
 
@@ -29,12 +29,12 @@ For example, a PC (control center) establishes a network connection with the gat
 
 1. When deploying VPN, set the IP address to be in the same subnet as the PLC.
 
-2. Use EdgeLink Studio to set up the VPN and LAN1 bridge together, and download it to the gateway. For example, set the br0 IP to: 192.168.1.200.
+2. Use EdgeLink Studio to set up the VPN and LAN1 bridge together, and download it to the gateway. For example, set the br0 IP to: 192.168.1.100.
 
 ![](TCP004.png)
 
 
-3. Open the PLC communication software at the control center to configure the PLC.
+3. Open the PLC communication software at the control center to configure the PLC.(The communication software can directly connect to 192.168.1.10 for configuration)
 
 ### Scenario 3
 
@@ -52,6 +52,6 @@ When a single Ethernet port of the gateway is connected to multiple PLCs, and th
 2. Configure the corresponding route at the control center. EdgeLink Studio provides a reference script, which can be copied and directly executed in the command line at the control center.
 ![](TCP007.png)
 
-3. Open the PLC communication software at the control center to configure the PLC.
+3. Open the PLC communication software at the control center to configure the PLC.(The communication software connects to 11.1.2.18 to configure PLC1 that is connected to Gateway 1)
 
 For detailed configuration introduction of virtual networking, please refer to the [2.9.1.6 Virtual Network](../systemsetting/VirtualNetwork.html) section.

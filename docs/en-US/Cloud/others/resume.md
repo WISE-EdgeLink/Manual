@@ -13,7 +13,6 @@
 
 | parameter |  parameter description                                                                                                                                 |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------|
-|`Pub all after reconn`|When EdgeLink establishes a connection with the cloud, does it upload the current values of all points once to the cloud, with enabling sending and disabling not sending? The default setting is enabling sending                                           |
 |`Enable data resume`|Enable switch for resume upload from break                                                                                                                  |
 |`Data before break`|Default: 0, resume uploading data from the most recent n seconds before the disconnection                                                                                                                  |
 |`Data after reconnect`|Default: 0, resume uploading data until the most recent n seconds after the  reconnection                                                                                                |

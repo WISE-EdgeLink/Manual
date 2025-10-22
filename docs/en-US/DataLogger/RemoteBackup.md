@@ -24,7 +24,7 @@ Currently, data backup is divided into SQL Server and FTP Server according to th
 
 After the content to be backed up (such as a tag) has been added to the backup list under the connection, the server type cannot be modified; after all the contents in the backup list have been deleted, the server type can be modified.
 
-###SQL Server Method###
+### SQL Server Method ###
 
 In the data backup settings area, select Server Type as SQL Server to back up the selected tag data in ODBC mode. The information you need to fill out includes:
 
@@ -64,12 +64,17 @@ If the "TagLogger" function is unavailable or the stored Tag is not specified in
 
 ![](remotebackup_selecttag_warning.png)
 
-###MySQL Server Method###
+### MySQL Server Method ###
 
 In the data backup settings area, select Server Type as MySQL Server to back up the selected tag data in MySQL mode. The information you need to fill out is same as SQL Server.
 
 
-###ORACLE Method###
+### PostgreSQL Server Method ###
+
+In the data backup settings area, select Server Type as PostgreSQL to back up the selected tag data in PostgreSQL mode. The information you need to fill out is same as SQL Server.
+
+
+### ORACLE Method ###
 
 In the data backup setting area, select Server Type as ORACLE Server to back up the selected tag data by ORACLE. The information you need to fill out includes:
 
@@ -97,45 +102,42 @@ In the data backup setting area, select Server Type as ORACLE Server to back up 
 The table storing the timestamp of the tag value cannot be customized. When the device connects to the database, the FORRECORDTIME table will be created by default to store the last uploaded timestamp of the tag, which is used for the device's data resume function.
 
 
-###FTP Server Method###
+### FTP Server Method ###
+In the data backup settings area, select "Server Type" as "FTP Server" to back up the selected point data via FTP.
 
-In the data backup setting area, select Server Type as FTP Server to back up the selected tag data by FTP. The information you need to fill out includes:
-
-IP/Domain: The IP address or domain name of the backup server.
-
-Port: The port number of the database.
-
-User Name: The username to log in to the remote server.
-
-Password: The password to log in to the remote server.
-
-Upload Interval: The interval at which the device uploads files to the server. The default is 5 minutes.
-
-Whether to enable active mode: whether the mode of connecting to the server is active. FTP supports two modes, one is Standard (PORT), and the other is Passive (PASV). In active mode, the FTP client sends a PORT command to the FTP server. In passive mode, the FTP client sends a PASV command to the FTP server. Active mode is not enabled by default, ie passive connections are used.
-
-Whether to enable upload from break: For files that are incompletely transmitted due to network reasons during transmission, continue to transmit or delete incomplete files and retransmit after network recovery. Consider that some servers do not support this feature and are not enabled by default.
-
-File name prefix: Multiple users or multiple devices transmitting to the same server at the same time will result in consistent file name conflicts, prefixing the file names for differentiation.
-
-Column type: Click on the blank line in the "column type" in the list, you can choose to add a column of data to the backup FTP file. The optional types include "tag" and the corresponding "row index", "local time", and "UTC time" when the tag is stored.
-
-Format: Only for the format of "serial number", "local time", "UTC time".
-
-Column Name: Users can rename the name of the data column that needs to be stored.
-
+#### Parameter Description
 
 ![](remotebackup_columntype.png)
 
+| Parameter | Description |
+|---------------------------|-----------------------------------------------------|
+| IP/Domain Name | The IP address or domain name of the backup server |
+| Port Number | The port number required to connect to the database |
+| Username | The username for remote login to the server |
+| Password | The password for remote login to the server |
+| File Name Prefix | To avoid file name conflicts when multiple users or devices transmit data to the same server simultaneously, a prefix can be added to the file name for differentiation |
+| Active Mode | Whether the connection mode to the server is active. FTP supports two modes: Standard (PORT, i.e., active mode) and Passive (PASV, i.e., passive mode). In active mode, the FTP client sends a PORT command to the FTP server, while in passive mode, the FTP client sends a PASV command to the FTP server. By default, active mode is not enabled, meaning passive connection is used |
+| Upload from break | For files that are not completely transferred due to network issues during transmission, the incomplete part can be resumed or the incomplete file can be deleted and retransmitted when the connection is restored. Since some servers do not support this feature, it is disabled by default |
+| Data Type | Default is all data, which refers to all data in the point list stored in DataLogger. In addition to this, it also supports forwarding of statistical data, including minute, hour, and daily statistics |
+| File Slicing Interval | The duration of stored data to be saved in one file. For example, if this parameter is set to 5 minutes, the data stored every 5 minutes for the tags in the point list will be generated into one file |
+| File Slicing Start Time | The time offset at which the backup file begins to record data. For example, if the file split interval is 5 minutes and the file split start time is 2025/3/19 9:03:19 (UTC), with a storage cycle of 1 second for the tag in DataLogger, and the backup program is launched at 2025/3/19 9:05:29 (UTC) after downloading the project, the first file will back up data from 2025/3/19 9:05:29 to 2025/3/19 9:08:28, and the second file will back up data from 2025/3/19 9:08:29 to 2025/3/19 9:13:28, and so on |
+| Care History Data | By default, this option is not checked. If checked, the backup program will record the time when the backup stops. When the backup program is restarted, it will back up the data stored in DataLogger between the two program launches |
+| Data Delay Time | The delay time for data backup |
 
-Tag: When the selected column type is "tag", the user can select the tag to be backed up in the pop-up dialog box and modify the "column name" in the list. The contents of the data will be displayed in the FTP file according to the "column name" set by the user.
+#### Point Table Parameter Description
 
-Row Index: When the selected column type is "serial number", the user can modify the "format" and "column name" in the list. The "format" should be filled with an integer greater than 0, indicating the index value of the first row of the backup data.
-
-Local Time or UTC Time: When the selected column type is "local time" or "UTC time", the default saved data format is "% F% T". Users can set the time format of the backup in the pop-up dialog box. The code in different time formats is given in the date list at the bottom of the window, and an example of the time format is shown in "Save as". Users can use the various formats in the date list. Specify the time format and click the OK button, and the "time format" code will appear in the list, where the user can modify the "column name" that is saved by the time column.
-
-
-![](remotebackup_time.png)
-
-![](remotebackup_ftptable.png)
+| Parameter | Description |
+|---------------------------|-----------------------------------------------------|
+| Column Type | Click on the blank row in the "Column Type" column in the list to add a column of data to the backup FTP file. The available types include "Point" and the corresponding "Serial Number," "Local Time," and "UTC Time" when storing points |
+| Point | When the column type is selected as "Point," users can batch-select the points to be backed up in the pop-up dialog box and modify the "Column Name" in the list. The data content will be displayed in the FTP file according to the "Column Name" set by the user |
+| Serial Number | When the column type is selected as "Serial Number," users can modify the "Data Format" and "Column Name" in the list. The "Data Format" should be an integer greater than 0, representing the index value of the first row of data to be backed up |
+| Local Time or UTC Time | When the column type is selected as "Local Time" or "UTC Time," the default data format is "%F %T." Users can set the required time format for backup in the pop-up dialog box. The date list at the bottom of the window provides codes for different time formats and displays examples of time formats in the "Save As" section. Users can combine various formats from the date list. After specifying the time format and clicking the OK button, the "Time Format" code will be displayed in the list, and users can modify the "Column Name" for the time column |
+| Column Name | The column name of the data to be stored can be renamed |
+| Data Format | Applies only to the formats of "Serial Number," "Local Time," and "UTC Time" |
+| Value Type | Applies only to statistical types such as minute statistics, hour statistics, and day statistics. Options include average value, maximum value, minimum value, and last value |
 
 The file uploaded by FTP Server is a csv file. The system records the value of the same timestamp of all tags selected for backup as one piece of data in the table.
+
+### SFTP Server Configuration Instructions
+
+In the data backup settings area, select "Server Type" as "SFTP Server" to back up the selected point data via the SFTP Server method. The information required to be filled in is the same as that for the "FTP Server."

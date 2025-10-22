@@ -20,5 +20,7 @@ The main functions of Advantech EdgeLink Studio include:
 5. Since protocol services are crucial to communication devices, EdgeLink offers Modbus RTU, Modbus TCP and BACnet servers for users to select according to their specific requirements. 
 
 6. Moreover, monitoring the communication status of both remote serial ports and network ports is supported. 
-The acquisition path for EdgeLink Studio installation package is as follows:
-[http://www.advantech.com.cn](http://support.advantech.com/support/SearchResult.aspx?keyword=EdgeLink&searchtabs=BIOS,Certificate,Datasheet,Driver,FAQ,Firmware,Installation,Manual,Online%20Training,Software%20Utility,Software%20API,Software%20API%20Manual,Utility,3D%20Model,Quick%20Start%20Guide,Reference)
+
+
+## The acquisition path for EdgeLink Studio installation package is as follows:
+[http://www.advantech.com.cn](https://www.advantech.com.cn/zh-cn/support/details/utility?id=1-28QPAEB){target="_blank"}

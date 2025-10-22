@@ -1,4 +1,4 @@
-## Configure Calculation Tag　　
+## Configure Calculation Tag
 
 Calculation tag is a kind of special tags, the value of which indicates the calculation result of an formula. The parameter of this formula can be a tag or a constant. Also, the expression can utilize some common calculation methods, including arithmetic & logic operation and trigonometric function, etc..
 
@@ -30,7 +30,7 @@ On the right of "Expression" box there is a calculator button![](CalcTag_3.png).
 
 ![](CalcTag_2.png)
 
-To verify the expression is correct or not, users can click this button![](CalcTag_4.png)to get the result, then review it to see its correctness. After the expression has been verified, click "OK" button to update the value; if users do not want to update it, click "Cancel" button.　
+To verify the expression is correct or not, users can click this button![](CalcTag_4.png)to get the result, then review it to see its correctness. After the expression has been verified, click "OK" button to update the value; if users do not want to update it, click "Cancel" button.
 
 ### Function and Operator Description
 
@@ -52,12 +52,6 @@ All functions and operators are described as follows:
 |  /       | Division between x and y.  (eg: x / y)                  |
 |  %       | Modulus of x with respect to y.  (eg: x % y)            |
 |  ^       | x to the power of y.  (eg: x ^ y)                       |
-|  :=      | Assign the value of x to y. Where y is either a variable<br> or vector type.  (eg: y := x)|
-|  +=      | Increment x by the value of the expression on the right<br> hand side. Where x is either a variable or vector type.<br>(eg: x += abs(y - z))                                   |
-|  -=      | Decrement x by the value of the expression on the right<br> hand side. Where x is either a variable or vector type.<br> (eg: x[i] -= abs(y + z))                                |
-|  *=      | Assign the multiplication of x by the value of the<br> expression on the righthand side to x. Where x is either<br> a variable or vector type.<br> (eg: x *= abs(y / z))                                   |
-|  /=      | Assign the division of x by the value of the expression<br> on the right-hand side to x. Where x is either a<br> variable or vector type.  (eg: x[i + j] /= abs(y * z))  |
-|  %=      | Assign x modulo the value of the expression on the right<br> hand side to x. Where x is either a variable or vector<br> type.  (eg: x[2] %= y ^ 2)                              |
 
 
 (1) Equalities & Inequalities
@@ -126,8 +120,6 @@ All functions and operators are described as follows:
 | sgn      | Sign of x, -1 where x < 0, +1 where x > 0, else zero.<br> (eg: sgn(x))                                            |
 | sqrt     | Square root of x, where x >= 0.  (eg: sqrt(x))          |
 | sum      | Sum of all the inputs.<br> (eg: sum(x,y,z,w,u,v,t) == (x + y + z + w + u + v + t)) |
-| swap     | Swap the values of the variables x and y and return the |
-| <=>      | current value of y.  (eg: swap(x,y) or x <=> y)         |
 | trunc    | Integer portion of x.  (eg: trunc(x))                   |
 
 
@@ -156,43 +148,3 @@ All functions and operators are described as follows:
 | deg2grad | Convert x from degrees to gradians.  (eg: deg2grad(x))  |
 | rad2deg  | Convert x from radians to degrees.  (eg: rad2deg(x))    |
 | grad2deg | Convert x from gradians to degrees.  (eg: grad2deg(x))  |
-
-
-(5) String Processing
-
-| FUNCTION | DEFINITION                                              |
-| ------ | --------------------------------------------- |
-|  = , ==  | All common equality/inequality operators are applicable |
-|  !=, <>  | to strings and are applied in a case sensitive manner.  |
-|  <=, >=  | In the following example x, y and z are of type string. |
-|  < , >   | (eg: not((x <= 'AbC') and ('1x2y3z' <> y)) or (z == x)  |
-| in       | True only if x is a substring of y.<br> (eg: x in y or 'abc' in 'abcdefgh')                     |
-| like     | True only if the string x matches the pattern y.<br> Available wildcard characters are '*' and '?' denoting<br> zero or more and zero or one matches respectively.<br> (eg: x like y or 'abcdefgh' like 'a?d*h')               |
-| ilike    | True only if the string x matches the pattern y in a<br> case insensitive manner. Available wildcard characters<br> are '*' and '?' denoting zero or more and zero or one<br> matches respectively.<br> (eg: x ilike y or 'a1B2c3D4e5F6g7H' ilike 'a?d*h')      |
-| [r0:r1]  | The closed interval [r0,r1] of the specified string.<br> eg: Given a string x with a value of 'abcdefgh' then:<br> 1. x[1:4] == 'bcde'<br> 2. x[ :5] == x[:10 / 2] == 'abcdef'<br> 3. x[2 + 1: ] == x[3:] =='defgh'<br> 4. x[ : ] == x[:] == 'abcdefgh'<br> 5. x[4/2:3+2] == x[2:5] == 'cdef'<br><br> Note: Both r0 and r1 are assumed to be integers, where<br> r0 <= r1. They may also be the result of an expression,<br> in the event they have fractional components truncation<br> will be performed. (eg: 1.67 --> 1)                     |
-|  :=      | Assign the value of x to y. Where y is a mutable string<br> or string range and x is either a string or a string<br> range. eg:<br> 1. y := x<br> 2. y := 'abc'<br> 3. y := x[:i + j]<br> 4. y := '0123456789'[2:7]<br> 5. y := '0123456789'[2i + 1:7]<br> 6. y := (x := '0123456789'[2:7])<br> 7. y[i:j] := x<br> 8. y[i:j] := (x + 'abcdefg'[8 / 4:5])[m:n]<br><br> Note: For options 7 and 8 the shorter of the two ranges<br> will denote the number characters that are to be copied.|
-|  +       | Concatenation of x and y. Where x and y are strings or<br> string ranges. eg<br> 1. x + y<br> 2. x + 'abc'<br> 3. x + y[:i + j]<br> 4. x[i:j] + y[2:3] + '0123456789'[2:7]<br> 5. 'abc' + x + y<br> 6. 'abc' + '1234567'<br> 7. (x + 'a1B2c3D4' + y)[i:2j]                           |
-|  +=      | Append to x the value of y. Where x is a mutable string<br> and y is either a string or a string range. eg:<br> 1. x += y<br> 2. x += 'abc'<br> 3. x += y[:i + j] + 'abc'<br> 4. x += '0123456789'[2:7]                               |
-| <=>      | Swap the values of x and y. Where x and y are mutable<br> strings.  (eg: x <=> y)                                 |
-| []       | The string size operator returns the size of the string<br> being actioned.<br> eg:<br> 1. 'abc'[] == 3<br> 2. var max_str_length := max(s0[],s1[],s2[],s3[])<br> 3. ('abc' + 'xyz')[] == 6<br> 4. (('abc' + 'xyz')[1:4])[] == 4                        |
-
-
-(6) Control Structures
-
-|STRUCTURE | DEFINITION                                              |
-| ------ | --------------------------------------------- |
-| if       | If x is true then return y else return z.<br> eg:<br> 1. if (x, y, z)<br> 2. if ((x + 1) > 2y, z + 1, w / v)<br> 3. if (x > y) z;<br> 4. if (x <= 2*y) { z + w };                             |
-| if-else  | The if-else/else-if statement. Subject to the condition<br> branch the statement will return either the value of the<br> consequent or the alternative branch.<br> eg:<br> 1. if (x > y) z; else w;<br> 2. if (x > y) z; else if (w != u) v;<br> 3. if (x < y) { z; w + 1; } else u;<br> 4. if ((x != y) and (z > w))<br> &nbsp;&nbsp;&nbsp;{<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y := sin(x) / u;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z := w + 1;<br> &nbsp;&nbsp;&nbsp;}<br> &nbsp;&nbsp;&nbsp;else if (x > (z + 1))<br> &nbsp;&nbsp;&nbsp;{<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w := abs (x - y) + z;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;u := (x + 1) > 2y ? 2u : 3u;<br> &nbsp;&nbsp;&nbsp;}                                                    |
-| switch   | The first true case condition that is encountered will<br> determine the result of the switch. If none of the case<br> conditions hold true, the default action is assumed as<br> the final return value. This is sometimes also known as<br> a multi-way branch mechanism.<br> eg:<br> switch<br> {<br> &nbsp;&nbsp;case x > (y + z) : 2 * x / abs(y - z);<br> &nbsp;&nbsp;case x < 3       : sin(x + y);<br> &nbsp;&nbsp;default          : 1 + x;<br> }                                                       |
-| while    | The structure will repeatedly evaluate the internal<br> statement(s) 'while' the condition is true. The final<br> statement in the final iteration will be used as the<br> return value of the loop.<br> eg:<br> while ((x -= 1) > 0)<br> {<br> &nbsp;&nbsp;y := x + z;<br> &nbsp;&nbsp;w := u + y;<br> }                                                       |
-| repeat/  | The structure will repeatedly evaluate the internal     |
-| until    | statement(s) 'until' the condition is true. The final<br> statement in the final iteration will be used as the<br> return value of the loop.<br> eg:<br> repeat<br> &nbsp;&nbsp;y := x + z;<br> &nbsp;&nbsp;w := u + y;<br> until ((x += 1) > 100)                                  |
-| for      | The structure will repeatedly evaluate the internal<br> statement(s) while the condition is true. On each loop<br> iteration, an 'incrementing' expression is evaluated.<br> The conditional is mandatory whereas the initialiser<br> and incrementing expressions are optional.<br> eg:<br> for (var x := 0; (x < n) and (x != y); x += 1)<br> {<br> &nbsp;&nbsp;y := y + x / 2 - z;<br> &nbsp;&nbsp;w := u + y;<br> }                                                       |
-| break    | Break terminates the execution of the nearest enclosed  |
-| break[]  | loop, allowing for the execution to continue on external<br> to the loop. The default break statement will set the<br> return value of the loop to NaN, where as the return<br> based form will set the value to that of the break<br> expression.<br> eg:<br> while ((i += 1) < 10)<br> {<br> &nbsp;&nbsp;if (i < 5)<br> &nbsp;&nbsp;&nbsp;&nbsp;j -= i + 2;<br> &nbsp;&nbsp;else if (i % 2 == 0)<br> &nbsp;&nbsp;&nbsp;&nbsp;break;<br> &nbsp;&nbsp;else<br> &nbsp;&nbsp;&nbsp;&nbsp;break[2i + 3];<br> }                                                       |
-| continue | Continue results in the remaining portion of the nearest<br> enclosing loop body to be skipped.<br> eg:<br> for (var i := 0; i < 10; i += 1)<br> {<br> &nbsp;&nbsp;if (i < 5)<br> &nbsp;&nbsp;&nbsp;&nbsp;continue;<br> &nbsp;&nbsp;j -= i + 2;<br> }                                                       |
-| return   | Return immediately from within the current expression.<br> With the option of passing back a variable number of<br> values (scalar, vector or string). eg:<br> 1. return [1];<br> 2. return [x, 'abx'];<br> 3. return [x, x + y,'abx'];<br> 4. return [];<br> 5. if (x < y)<br> &nbsp;&nbsp;&nbsp;&nbsp;return [x, x - y, 'result-set1', 123.456];<br> &nbsp;&nbsp;&nbsp;else<br> &nbsp;&nbsp;&nbsp;&nbsp;return [y, x + y, 'result-set2'];                   |
-| ?:       | Ternary conditional statement, similar to that of the<br> above denoted if-statement.<br> eg:<br> 1. x ? y : z<br> 2. x + 1 > 2y ? z + 1 : (w / v)<br> 3. min(x,y) > z ? (x < y + 1) ? x : y : (w * v)         |
-| ~        | Evaluate each sub-expression, then return as the result<br> the value of the last sub-expression. This is sometimes<br> known as multiple sequence point evaluation.<br> eg:<br> ~(i := x + 1, j := y / z, k := sin(w/u)) == (sin(w/u)))<br> ~{i := x + 1; j := y / z; k := sin(w/u)} == (sin(w/u))) |
-| [*]      | Evaluate any consequent for which its case statement is<br> true. The return value will be either zero or the result<br> of the last consequent to have been evaluated.<br> eg:<br> [*]<br> {<br> &nbsp;&nbsp;case (x + 1) > (y - 2)    : x := z / 2 + sin(y / pi);<br> &nbsp;&nbsp;case (x + 2) < abs(y + 3) : w / 4 + min(5y,9);<br> &nbsp;&nbsp;case (x + 3) == (y * 4)   : y := abs(z / 6) + 7y;<br> }                                                       |
-| []       | The vector size operator returns the size of the vector<br> being actioned.<br> eg:<br> 1. v[]<br> 2. max_size := max(v0[],v1[],v2[],v3[])                 |

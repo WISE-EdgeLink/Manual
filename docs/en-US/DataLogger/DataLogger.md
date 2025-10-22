@@ -2,7 +2,7 @@
 
 DataLogger is the software module that implements historical data storage on EdgeLink. 
 
-The DataLogger module uses SQLite as the base storage medium, saves the data in the "Tag historical data table", and saves the data in minutes, hours and days three historical data tables.
+The DataLogger module uses SQLite as the base storage medium, saves the data in the "Tag historical data table", and saves the data in minutes, hours and days three historical data tables.(When the storage mode is set to variable storage(On Value Change), no statistical data table is generated.)
 
 ### DataLogger Parameter Configuration：
 
@@ -12,10 +12,12 @@ The DataLogger module uses SQLite as the base storage medium, saves the data in 
 2. USB Disk backup: select this item, the existed historical data will be copied into the USB disk from SD card only when the system detects an insertion event. The newly added historical data is still stored in the SD card.
 3. Storage address enabled: the location of the data store is stored on the SD card by default. **The SD card must be installed before using DataLogger function**;
 4. Save the number of days (days): the maximum number of days of historical data is 7 days by default. If the number of days saved is exceeded, the system will automatically delete the earliest stored data.
+5. Time alignment: only periodic storage support, whether the timestamp is aligned, check to align, unchecked to be unaligned; Alignment refers to the start time of periodic storage to store the latest hourly time after the storage program starts running.
+6. Time Alignment Offset: If Time Alignment is checked, you can also set the offset
 
 Example:
-- If the periodic storage period is 10S, the stored program starts to run at 13:15:17, then the time is 13:15:20 for the first stored data and 13:15:30 for the next data
-
+- If the periodic storage period is 10S, the time alignment and the time alignment offset is 2S, the stored program starts to run at 13:15:17, then the time is 13:15:22 for the first stored data and 13:15:32 for the next data
+- The periodic storage period is 10S, the time alignment is not checked, and the stored program starts running at 13:15:17, then the time is 13:15:17 for the first stored data and 13:15:27 for the next data
 
 ### Storage group parameter configuration：
 
