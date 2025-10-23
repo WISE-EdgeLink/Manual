@@ -11,11 +11,6 @@
 </head>
 
 <body>
-  <!-- 顶部语言切换 -->
-  <nav style="text-align:right;padding:8px 12px;">
-    <a href="#/">EN</a> |
-    <a href="#/zh-CN/">中文</a>
-  </nav>
   <div id="app">加载中...</div>
 
   <script>
@@ -60,11 +55,10 @@
       alias: {
         '/zh-CN/(.*)_sidebar.md': '/zh-CN/_sidebar.md',
         '/en-US/(.*)_sidebar.md': '/en-US/_sidebar.md',
-        '/.*/_sidebar.md': '/_sidebar.md'
       },
 
       /* 2-2 导航栏 */
-      loadNavbar: true,
+      loadNavbar: false,
 
       /* 2-3 搜索（多语言） */
       search: {
