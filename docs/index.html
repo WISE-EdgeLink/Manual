@@ -15,8 +15,42 @@
   </head>
   <body>
     <div id="app"></div>
+
+
+
     <script>  
-      window.$docsify = {
+      // 1. 语言资源
+  const i18n = {
+    'en-US': {
+      placeholder: 'Search',
+      noData: 'No results!',
+      previous: 'Previous',
+      next: 'Next'
+    },
+    'zh-CN': {
+      placeholder: '搜索',
+      noData: '找不到结果',
+      previous: '上一页',
+      next: '下一页'
+    }
+  };
+
+  // 2. 根据 hash 读取当前语言文件夹
+  function getLang() {
+    const m = location.hash.match(/^#\/(en-US|zh-CN)\b/);
+    return m ? m[1] : 'en-US';   // 默认英文
+  }
+
+    window.$docsify = {
+
+     search: {
+      placeholder: i18n[getLang()].placeholder,
+      noData: i18n[getLang()].noData
+    },
+    pagination: {
+      previousText: i18n[getLang()].previous,
+      nextText: i18n[getLang()].next
+    },
         name: 'EdgeLink',
         // 侧边栏文档目录
         loadSidebar: true,
@@ -30,42 +64,43 @@
 
         // PLUGINS
         // ----------------------------------------------------------------
-        // 页面右侧toc
-        toc: {
-          tocMaxLevel: 6,
-          target: "h2, h3, h4, h5, h6",
-        },
+          // 右侧目录
+  toc: {
+    tocMaxLevel: 6,
+    target: 'h2, h3, h4, h5, h6'
+  },
 
-        // 全文搜索
-        search: {
-          depth: 6,
-          noData: "没有搜到!",
-          placeholder: "搜索...",
-          // 避免搜索索引冲突,同一域下的多个网站之间
-          namespace: "website-1",
-        },
-        // 底部导航
-        pagination: {
-          previousText: "上一页",
-          nextText: "下一页",
-          crossChapter: true,
-          crossChapterText: true,
-        },
-        // 字数统计
-        count: {
-          countable: true,
-          position: "top",
-          margin: "10px",
-          float: "right",
-          fontsize: "0.9em",
-          color: "red",
-          language: "chinese",
-          localization: {
-            words: "",
-            minute: "",
-          },
-          isExpected: true,
-        },
+  // 全文搜索
+  search: {
+    depth: 6,
+    noData: t.noData,        // ← 改这里
+    placeholder: t.placeholder, // ← 改这里
+    namespace: 'website-1'
+  },
+
+  // 底部导航
+  pagination: {
+    previousText: t.previous, // ← 改这里
+    nextText: t.next,         // ← 改这里
+    crossChapter: true,
+    crossChapterText: true
+  },
+
+  // 字数统计
+  count: {
+    countable: true,
+    position: 'top',
+    margin: '10px',
+    float: 'right',
+    fontsize: '0.9em',
+    color: 'red',
+    language: getLang() === 'zh-CN' ? 'chinese' : 'english',
+    localization: {
+      words: '',
+      minute: ''
+    },
+    isExpected: true
+  },
       };
     </script>
     <!-- docsify -->
