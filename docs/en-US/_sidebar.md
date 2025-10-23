@@ -1,4 +1,4 @@
-- [返回首页](/)
+- [Back to Home](/)
 - [en-US](en-US/)
   - [1. Introduction of EdgeLink Studio](en-US/projectconfiguration/Description.md)  
   - [2. Project Configuration](en-US/projectconfiguration/ProjectConfiguration.md)  
