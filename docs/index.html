@@ -1,151 +1,133 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css" />
+<head>
+  <meta charset="UTF-8">
+  <title>EdgeLink Docs</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
+  <!-- 折叠侧边栏样式 -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar-folder.min.css">
+</head>
 
-    <!-- 文件夹样式 -->
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar-folder.min.css" />
-    <!-- 箭头样式 -->
-    <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar.min.css" /> -->
-  </head>
-  <body>
-    <div id="app"></div>
+<body>
+  <!-- 顶部语言切换 -->
+  <nav style="text-align:right;padding:8px 12px;">
+    <a href="#/">EN</a> |
+    <a href="#/zh-CN/">中文</a>
+  </nav>
+  <div id="app">加载中...</div>
 
+  <script>
+    /* 0. 语言资源 */
+    const i18n = {
+      'en-US': {
+        placeholder: 'Search',
+        noData: 'No results!',
+        previous: 'Previous',
+        next: 'Next',
+        words: 'words',
+        minute: 'min'
+      },
+      'zh-CN': {
+        placeholder: '搜索',
+        noData: '找不到结果',
+        previous: '上一页',
+        next: '下一页',
+        words: '字',
+        minute: '分钟'
+      }
+    };
 
-
-    <script>  
-      // 1. 语言资源
-  const i18n = {
-    'en-US': {
-      placeholder: 'Search',
-      noData: 'No results!',
-      previous: 'Previous',
-      next: 'Next'
-    },
-    'zh-CN': {
-      placeholder: '搜索',
-      noData: '找不到结果',
-      previous: '上一页',
-      next: '下一页'
+    /* 1. 根据 hash 拿到语言 */
+    function getLang() {
+      const m = location.hash.match(/^#\/(zh-CN|en-US)\b/);
+      return m ? m[1] : 'en-US';
     }
-  };
 
-  // 2. 根据 hash 读取当前语言文件夹
-  function getLang() {
-    const m = location.hash.match(/^#\/(en-US|zh-CN)\b/);
-    return m ? m[1] : 'en-US';   // 默认英文
-  }
+    const lang = getLang();
+    const t = i18n[lang];
 
+    /* 2. Docsify 主配置 */
     window.$docsify = {
+      name: 'EdgeLink',
+      repo: '',
+      auto2top: true,
 
-     search: {
-      placeholder: i18n[getLang()].placeholder,
-      noData: i18n[getLang()].noData
-    },
-    pagination: {
-      previousText: i18n[getLang()].previous,
-      nextText: i18n[getLang()].next
-    },
-        name: 'EdgeLink',
-        // 侧边栏文档目录
-        loadSidebar: true,
+      /* 2-1 侧边栏：各语言目录独享 */
+      loadSidebar: true,
+      subMaxLevel: 3,
+      alias: {
+        '/zh-CN/(.*)_sidebar.md': '/zh-CN/_sidebar.md',
+        '/en-US/(.*)_sidebar.md': '/en-US/_sidebar.md',
+        '/.*/_sidebar.md': '/_sidebar.md'
+      },
 
-        subMaxLevel: 0,
-      //  alias: {
-      //    "/.*/_sidebar.md": "/_sidebar.md",
-      //  },
-        // 跳转后自动到顶部
-        auto2top: true,
+      /* 2-2 导航栏 */
+      loadNavbar: true,
 
-        // PLUGINS
-        // ----------------------------------------------------------------
-          // 右侧目录
-  toc: {
-    tocMaxLevel: 6,
-    target: 'h2, h3, h4, h5, h6'
-  },
+      /* 2-3 搜索（多语言） */
+      search: {
+        namespace: 'edgeLink',
+        depth: 4,
+        placeholder: t.placeholder,
+        noData: t.noData,
+        // 让搜索只扫当前语言目录
+        pathNamespaces: ['/zh-CN', '/en-US']
+      },
 
-  // 全文搜索
-  search: {
-    depth: 6,
-    noData: t.noData,        // ← 改这里
-    placeholder: t.placeholder, // ← 改这里
-    namespace: 'website-1'
-  },
+      /* 2-4 分页 */
+      pagination: {
+        previousText: t.previous,
+        nextText: t.next,
+        crossChapter: true,
+        crossChapterText: true
+      },
 
-  // 底部导航
-  pagination: {
-    previousText: t.previous, // ← 改这里
-    nextText: t.next,         // ← 改这里
-    crossChapter: true,
-    crossChapterText: true
-  },
+      /* 2-5 右侧 TOC */
+      toc: {
+        tocMaxLevel: 5,
+        target: 'h2, h3, h4, h5'
+      },
 
-  // 字数统计
-  count: {
-    countable: true,
-    position: 'top',
-    margin: '10px',
-    float: 'right',
-    fontsize: '0.9em',
-    color: 'red',
-    language: getLang() === 'zh-CN' ? 'chinese' : 'english',
-    localization: {
-      words: '',
-      minute: ''
-    },
-    isExpected: true
-  },
-      };
-    </script>
-    <!-- docsify -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>  
+      /* 2-6 字数统计 */
+      count: {
+        countable: true,
+        position: 'top',
+        float: 'right',
+        fontsize: '0.9em',
+        color: 'rgb(90,90,90)',
+        language: lang === 'zh-CN' ? 'chinese' : 'english',
+        localization: {
+          words: t.words,
+          minute: t.minute
+        },
+        isExpected: true
+      }
+    };
+  </script>
 
-    <!-- 代码高亮  https://cdn.jsdelivr.net/npm/prismjs@1/components/ -->
-	
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>	
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-cmake.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>     
-    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-docker.min.js"></script>  
-	<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-powershell.min.js"></script>  
+  <!-- docsify 核心 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
 
+  <!-- 代码高亮（按需保留） -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-docker.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-powershell.min.js"></script>
 
-    <!-- 多tab支持 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1/dist/docsify-tabs.min.js"></script>
-
-    <!-- 代码复制 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
-
-    <!-- 底部 上一页下一页 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js"></script>
-
-    <!-- 全文搜索 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
-
-    <!-- 图片放大缩小 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
-
-    <!-- 字数统计 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-count@latest/dist/countable.min.js"></script>
-
-    <!-- 侧边栏目录折叠 -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
-
-    <!-- 页面右侧 TOC -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-plugin-toc@1.1.0/dist/docsify-plugin-toc.min.js"></script>
-
-      <!-- emoji -->
-      <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
-  </body>
+  <!-- 插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-count@latest/dist/countable.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-plugin-toc@1.1.0/dist/docsify-plugin-toc.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+</body>
 </html>
