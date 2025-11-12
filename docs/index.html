@@ -1,127 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>EdgeLink Docs</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
-  <!-- 折叠侧边栏样式 -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar-folder.min.css">
+    <meta charset="UTF-8">
+    <title>EdgeLink Docs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/docsify/4.13.1/themes/vue.css">
+    <style>
+        /* 样式保持不变 */
+        .selectors { position: fixed; top: 10px; right: 20px; background: white; padding: 10px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .selectors select { margin: 0 5px; padding: 4px; }
+        .loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 20px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1001; }
+        
+        /* 新增：版本提示 */
+        .version-hint { 
+            position: fixed; 
+            top: 50px; 
+            right: 20px; 
+            background: #f8f9fa; 
+            padding: 5px 10px; 
+            border-radius: 3px; 
+            font-size: 12px; 
+            color: #666;
+            z-index: 999;
+        }
+    </style>
 </head>
-
 <body>
-  <div id="app">加载中...</div>
+    <div class="loading" id="loading">加载中...</div>
+    <div class="version-hint" id="versionHint" style="display: none;">当前版本: <span id="currentVersion"></span></div>
+    
+    <div class="selectors">
+        <select id="version">
+            <option value="latest">最新版本</option>
+            <option value="v2.8.4.5">v2.8.4.5</option>
+            <option value="v2.8.3.5">v2.8.3.5</option>
+        </select>
+        <select id="language">
+            <option value="zh-CN">中文</option>
+            <option value="en-US">English</option>
+        </select>
+    </div>
+    <div id="app"></div>
 
-  <script>
-    /* 0. 语言资源 */
-    const i18n = {
-      'en-US': {
-        placeholder: 'Search',
-        noData: 'No results!',
-        previous: 'Previous',
-        next: 'Next',
-        words: 'words',
-        minute: 'min'
-      },
-      'zh-CN': {
-        placeholder: '搜索',
-        noData: '找不到结果',
-        previous: '上一页',
-        next: '下一页',
-        words: '字',
-        minute: '分钟'
-      }
-    };
+    <script>
+        // 配置
+        const CONFIG = {
+            latestVersion: 'v2.8.4.5',  // 最新版本
+            defaultLanguage: 'zh-CN'
+        };
 
-    /* 1. 根据 hash 拿到语言 */
-    function getLang() {
-      const m = location.hash.match(/^#\/(zh-CN|en-US)\b/);
-      return m ? m[1] : 'en-US';
-    }
+        // 显示/隐藏元素
+        function showLoading() { document.getElementById('loading').style.display = 'block'; }
+        function hideLoading() { document.getElementById('loading').style.display = 'none'; }
+        function showVersionHint(version) { 
+            document.getElementById('currentVersion').textContent = version; 
+            document.getElementById('versionHint').style.display = 'block'; 
+        }
+        function hideVersionHint() { document.getElementById('versionHint').style.display = 'none'; }
 
-    const lang = getLang();
-    const t = i18n[lang];
+        // 路径解析
+        function parsePath() {
+            const path = window.location.pathname;
+            const parts = path.split('/').filter(Boolean);
+            
+            // 默认值
+            let displayVersion = 'latest';
+            let actualVersion = CONFIG.latestVersion;
+            let language = CONFIG.defaultLanguage;
+            let docPath = '';
+            
+            if (parts.length >= 2) {
+                // 格式: /latest/zh-CN/ 或 /v2.8.4.5/zh-CN/
+                displayVersion = parts[0];
+                actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
+                language = parts[1];
+                docPath = '/' + parts.slice(2).join('/');
+            } else if (parts.length === 1) {
+                // 格式: /zh-CN/ (简化路径)
+                if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
+                    language = parts[0];
+                    displayVersion = 'latest';
+                    actualVersion = CONFIG.latestVersion;
+                }
+            }
+            
+            return { displayVersion, actualVersion, language, docPath };
+        }
 
-    /* 2. Docsify 主配置 */
-    window.$docsify = {
-      name: 'EdgeLink',
-      repo: '',
-      auto2top: true,
+        // 初始化Docsify
+        function initDocsify(actualVersion, language) {
+            const basePath = `/${actualVersion}/${language}/`;
+            
+            window.$docsify = {
+                name: 'EdgeLink',
+                loadSidebar: true,
+                subMaxLevel: 2,
+                auto2top: true,
+                basePath: basePath,
+                relativePath: false,
+                homepage: 'README.md',
+                loadSidebar: '_sidebar.md',
+                notFoundPage: 'README.md',
+                search: {
+                    depth: 3,
+                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
+                },
+                routerMode: 'history'
+            };
+        }
 
-      /* 2-1 侧边栏：各语言目录独享 */
-      loadSidebar: true,
-      subMaxLevel: 3,
-      alias: {
-        '/zh-CN/(.*)_sidebar.md': '/zh-CN/_sidebar.md',
-        '/en-US/(.*)_sidebar.md': '/en-US/_sidebar.md',
-      },
+        // 路径重写和重定向
+        function rewriteAndRedirect() {
+            const { displayVersion, actualVersion, language, docPath } = parsePath();
+            const currentPath = window.location.pathname;
+            
+            // 期望的显示路径
+            const expectedPath = `/${displayVersion}/${language}${docPath || '/'}`;
+            
+            // 如果当前路径不符合期望格式，进行重写
+            if (currentPath !== expectedPath && currentPath !== expectedPath.replace(/\/$/, '')) {
+                const newUrl = expectedPath + (window.location.search || '') + (window.location.hash || '');
+                history.replaceState(null, '', newUrl);
+            }
+            
+            return { displayVersion, actualVersion, language };
+        }
 
-      /* 2-2 导航栏 */
-      loadNavbar: false,
+        // 切换版本/语言
+        function switchVersionLang(displayVersion, language) {
+            showLoading();
+            
+            const { docPath } = parsePath();
+            const newPath = `/${displayVersion}/${language}${docPath || '/'}`;
+            const newUrl = newPath + (window.location.search || '') + (window.location.hash || '');
+            
+            setTimeout(() => {
+                window.location.replace(newUrl);
+            }, 100);
+        }
 
-      /* 2-3 搜索（多语言） */
-      search: {
-        namespace: 'edgeLink',
-        depth: 4,
-        placeholder: t.placeholder,
-        noData: t.noData,
-        // 让搜索只扫当前语言目录
-        pathNamespaces: ['/zh-CN', '/en-US']
-      },
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const { displayVersion, actualVersion, language } = rewriteAndRedirect();
+            
+            // 更新UI
+            document.getElementById('version').value = displayVersion;
+            document.getElementById('language').value = language;
+            
+            // 显示版本提示（如果不是最新版本）
+            if (displayVersion !== 'latest') {
+                showVersionHint(actualVersion);
+            }
+            
+            // 绑定事件
+            document.getElementById('version').addEventListener('change', function() {
+                switchVersionLang(this.value, document.getElementById('language').value);
+            });
+            
+            document.getElementById('language').addEventListener('change', function() {
+                switchVersionLang(document.getElementById('version').value, this.value);
+            });
+            
+            // 初始化Docsify
+            initDocsify(actualVersion, language);
+            
+            setTimeout(hideLoading, 3000);
+        });
 
-      /* 2-4 分页 */
-      pagination: {
-        previousText: t.previous,
-        nextText: t.next,
-        crossChapter: true,
-        crossChapterText: true
-      },
-
-      /* 2-5 右侧 TOC */
-      toc: {
-        tocMaxLevel: 5,
-        target: 'h2, h3, h4, h5'
-      },
-
-      /* 2-6 字数统计 */
-      count: {
-        countable: true,
-        position: 'top',
-        float: 'right',
-        fontsize: '0.9em',
-        color: 'rgb(90,90,90)',
-        language: lang === 'zh-CN' ? 'chinese' : 'english',
-        localization: {
-          words: t.words,
-          minute: t.minute
-        },
-        isExpected: true
-      }
-    };
-  </script>
-
-  <!-- docsify 核心 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
-
-  <!-- 代码高亮（按需保留） -->
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-docker.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-powershell.min.js"></script>
-
-  <!-- 插件 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-count@latest/dist/countable.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-plugin-toc@1.1.0/dist/docsify-plugin-toc.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+        window.addEventListener('docsify-ready', hideLoading);
+    </script>
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.13.1/docsify.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.13.1/plugins/search.min.js"></script>
 </body>
 </html>

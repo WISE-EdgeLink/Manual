@@ -1,3 +1,0 @@
-- [返回上一级 [Configuration]](en-US/OnlineFunctions/OnlineMonitor/Configuration/)
-- [TimeDate](en-US/OnlineFunctions/OnlineMonitor/Configuration/TimeDate/)
-  - [TimeDate](en-US/OnlineFunctions/OnlineMonitor/Configuration/TimeDate/TimeDate.md)

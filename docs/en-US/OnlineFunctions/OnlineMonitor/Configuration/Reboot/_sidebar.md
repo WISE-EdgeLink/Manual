@@ -1,3 +1,0 @@
-- [返回上一级 [Configuration]](en-US/OnlineFunctions/OnlineMonitor/Configuration/)
-- [Reboot](en-US/OnlineFunctions/OnlineMonitor/Configuration/Reboot/)
-  - [Reboot](en-US/OnlineFunctions/OnlineMonitor/Configuration/Reboot/Reboot.md)
