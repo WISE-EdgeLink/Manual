@@ -43,17 +43,6 @@
             color: #666;
             z-index: 999;
         }
-        .success-badge {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: #4CAF50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 12px;
-            z-index: 999;
-        }
     </style>
 </head>
 <body>
@@ -61,7 +50,6 @@
     <div class="version-hint" id="versionHint" style="display: none;">
         当前版本: <span id="currentVersion"></span>
     </div>
-    <div class="success-badge" id="successBadge" style="display: none;">✓ 配置正确</div>
     
     <div class="selectors">
         <select id="version">
@@ -77,13 +65,10 @@
     <div id="app"></div>
 
     <script>
-        // 配置 - 基于您当前正确的配置
+        // 配置 - 关键：必须在Docsify加载前定义
         const CONFIG = {
             latestVersion: 'v2.8.4.5',
-            defaultLanguage: 'zh-CN',
-            // GitHub Pages配置
-            isGitHubPages: true,
-            repoName: 'WISE-EdgeLink/Manual'
+            defaultLanguage: 'zh-CN'
         };
 
         // 显示/隐藏元素
@@ -94,7 +79,6 @@
             document.getElementById('versionHint').style.display = 'block'; 
         }
         function hideVersionHint() { document.getElementById('versionHint').style.display = 'none'; }
-        function showSuccess() { document.getElementById('successBadge').style.display = 'block'; }
 
         // 路径解析
         function parsePath() {
@@ -118,13 +102,14 @@
             return { displayVersion, actualVersion, language };
         }
 
-        // 初始化Docsify配置 - 保持您当前正确的配置
+        // 初始化Docsify配置 - 关键修复
         function initDocsifyConfig(actualVersion, language) {
-            // 关键：保持您当前正确的basePath配置
-            const basePath = `/${actualVersion}/${language}/`;
+            // 关键修复：GitHub Pages需要包含/docs/路径
+            const basePath = `${actualVersion}/${language}/`;
             
             console.log('初始化Docsify配置:', { basePath, actualVersion, language });
             
+            // 关键修复：必须在Docsify库加载前配置
             window.$docsify = {
                 name: 'EdgeLink Documentation',
                 repo: '',
@@ -138,24 +123,21 @@
                 notFoundPage: 'README.md',
                 search: {
                     depth: 3,
-                    placeholder: language === 'zh-CN' ? '搜索文档' : 'Search',
-                    noData: language === 'zh-CN' ? '没有找到结果' : 'No results found'
+                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
                 },
-                // 请求配置
-                requestHeaders: {
-                    'Cache-Control': 'no-cache'
-                },
-                // 主题配置
-                themeColor: '#42b983'
+                routerMode: 'history',
+                alias: {
+                    '/.*/_sidebar.md': '/_sidebar.md'
+                }
             };
         }
 
-        // 处理路由
+        // 路径重定向
         function handleRouting() {
             const { displayVersion, actualVersion, language } = parsePath();
             const currentPath = window.location.pathname;
             
-            // 期望路径格式
+            // 期望的显示路径（不包含/docs/）
             const expectedPath = `/${displayVersion}/${language}/`;
             
             // 检查是否需要重定向
@@ -182,17 +164,6 @@
             }, 100);
         }
 
-        // 检查Docsify是否正常加载
-        function checkDocsifyStatus() {
-            setTimeout(() => {
-                const appContent = document.getElementById('app').innerHTML;
-                if (appContent && appContent.trim() !== '') {
-                    showSuccess();
-                    console.log('✓ Docsify加载成功');
-                }
-            }, 2000);
-        }
-
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
             console.log('页面初始化开始');
@@ -212,17 +183,14 @@
                     showVersionHint(actualVersion);
                 }
                 
-                // 4. 初始化Docsify配置
+                // 4. 初始化Docsify配置 - 关键：在库加载前执行
                 initDocsifyConfig(actualVersion, language);
                 
                 // 5. 绑定事件
                 document.getElementById('version').addEventListener('change', switchVersionLang);
                 document.getElementById('language').addEventListener('change', switchVersionLang);
                 
-                console.log('初始化完成，等待Docsify加载');
-                
-                // 6. 检查加载状态
-                checkDocsifyStatus();
+                console.log('初始化完成');
                 
             } catch (error) {
                 console.error('初始化错误:', error);
@@ -234,18 +202,12 @@
 
         // Docsify事件
         window.addEventListener('docsify-ready', function() {
-            console.log('✓ Docsify准备就绪');
+            console.log('Docsify准备就绪');
             hideLoading();
-            showSuccess();
-        });
-        
-        // 全局错误处理
-        window.addEventListener('error', function(e) {
-            console.error('全局错误:', e.error);
         });
     </script>
     
-    <!-- Docsify库 -->
+    <!-- 关键：Docsify库必须在$docsify配置之后加载 -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
 </body>
