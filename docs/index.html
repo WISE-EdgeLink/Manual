@@ -65,10 +65,11 @@
     <div id="app"></div>
 
     <script>
-        // 配置 - 关键：必须在Docsify加载前定义
+        // 配置 - 关键修复：包含仓库名
         const CONFIG = {
             latestVersion: 'v2.8.4.5',
-            defaultLanguage: 'zh-CN'
+            defaultLanguage: 'zh-CN',
+            repoName: 'Manual'  // 关键：仓库名称
         };
 
         // 显示/隐藏元素
@@ -80,36 +81,47 @@
         }
         function hideVersionHint() { document.getElementById('versionHint').style.display = 'none'; }
 
-        // 路径解析
+        // 路径解析 - 关键修复：处理仓库名
         function parsePath() {
             const path = window.location.pathname;
             const parts = path.split('/').filter(Boolean);
+            
+            console.log('路径解析:', { path, parts });
             
             let displayVersion = 'latest';
             let actualVersion = CONFIG.latestVersion;
             let language = CONFIG.defaultLanguage;
             
-            if (parts.length >= 2) {
-                displayVersion = parts[0];
-                language = parts[1];
+            // 处理仓库名
+            let startIndex = 0;
+            if (parts.length > 0 && parts[0] === CONFIG.repoName) {
+                startIndex = 1; // 跳过仓库名
+            }
+            
+            const relevantParts = parts.slice(startIndex);
+            console.log('相关部分:', relevantParts);
+            
+            if (relevantParts.length >= 2) {
+                displayVersion = relevantParts[0];
+                language = relevantParts[1];
                 actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
-            } else if (parts.length === 1) {
-                if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
-                    language = parts[0];
+            } else if (relevantParts.length === 1) {
+                if (relevantParts[0] === 'zh-CN' || relevantParts[0] === 'en-US') {
+                    language = relevantParts[0];
                 }
             }
             
             return { displayVersion, actualVersion, language };
         }
 
-        // 初始化Docsify配置 - 关键修复
+        // 初始化Docsify配置 - 关键修复：包含仓库路径
         function initDocsifyConfig(actualVersion, language) {
-            // 关键修复：GitHub Pages需要包含/docs/路径
-            const basePath = `${actualVersion}/${language}/`;
+            // 关键修复：包含仓库名的basePath
+            const basePath = `/${CONFIG.repoName}/docs/${actualVersion}/${language}/`;
             
-            console.log('初始化Docsify配置:', { basePath, actualVersion, language });
+            console.log('Docsify配置:', { basePath, actualVersion, language });
             
-            // 关键修复：必须在Docsify库加载前配置
+            // 关键：必须在Docsify库加载前配置
             window.$docsify = {
                 name: 'EdgeLink Documentation',
                 repo: '',
@@ -125,24 +137,32 @@
                     depth: 3,
                     placeholder: language === 'zh-CN' ? '搜索' : 'Search'
                 },
-                routerMode: 'history',
                 alias: {
                     '/.*/_sidebar.md': '/_sidebar.md'
                 }
             };
         }
 
-        // 路径重定向
+        // 路径重定向 - 关键修复：包含仓库名
         function handleRouting() {
             const { displayVersion, actualVersion, language } = parsePath();
             const currentPath = window.location.pathname;
             
-            // 期望的显示路径（不包含/docs/）
-            const expectedPath = `/${displayVersion}/${language}/`;
+            // 关键修复：期望路径包含仓库名
+            const expectedPath = `/${CONFIG.repoName}/${displayVersion}/${language}/`;
+            
+            console.log('路由检查:', {
+                currentPath,
+                expectedPath,
+                displayVersion,
+                actualVersion,
+                language
+            });
             
             // 检查是否需要重定向
             if (currentPath !== expectedPath && currentPath !== expectedPath.replace(/\/$/, '')) {
                 const newUrl = expectedPath + (window.location.search || '') + (window.location.hash || '');
+                console.log('执行重定向到:', newUrl);
                 history.replaceState(null, '', newUrl);
                 return { displayVersion, actualVersion, language, redirected: true };
             }
@@ -150,14 +170,17 @@
             return { displayVersion, actualVersion, language, redirected: false };
         }
 
-        // 切换版本/语言
+        // 切换版本/语言 - 关键修复：包含仓库名
         function switchVersionLang() {
             showLoading();
             
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
             
-            const newUrl = `/${version}/${language}/`;
+            // 关键修复：新URL包含仓库名
+            const newUrl = `/${CONFIG.repoName}/${version}/${language}/`;
+            
+            console.log('切换版本语言:', { version, language, newUrl });
             
             setTimeout(() => {
                 window.location.href = newUrl;
@@ -183,7 +206,7 @@
                     showVersionHint(actualVersion);
                 }
                 
-                // 4. 初始化Docsify配置 - 关键：在库加载前执行
+                // 4. 初始化Docsify配置
                 initDocsifyConfig(actualVersion, language);
                 
                 // 5. 绑定事件
