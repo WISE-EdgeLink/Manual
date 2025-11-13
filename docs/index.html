@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Edge链接文档</title>
+    <title>EdgeLink Docs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
     <style>
@@ -20,27 +20,25 @@
             margin: 0 5px;
             padding: 4px;
         }
-        .version-hint {
+        .loading {
             position: fixed;
-            top: 50px;
-            right: 20px;
-            background: #f8f9fa;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 12px;
-            color: #666;
-            z-index: 999;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
-    <div class="version-hint" id="versionHint" style="display: none;">
-        当前版本: <span id="currentVersion"></span>
-    </div>
+    <div id="loading" class="loading" style="display: none;">加载中...</div>
     
     <div class="selectors">
         <select id="version">
-            <option value="latest">最新版本</option>
+            <option value="latest">最新版本 (v2.8.4.5)</option>
             <option value="v2.8.4.5">v2.8.4.5</option>
             <option value="v2.8.3.5">v2.8.3.5</option>
         </select>
@@ -58,26 +56,24 @@
             defaultLanguage: 'zh-CN'
         };
 
-        // 简单的状态管理
-        let currentState = { version: 'latest', language: 'zh-CN' };
-        let navigationLock = false;
+        let isInitialized = false;
+        let currentDocsify = null;
 
-        // 显示/隐藏版本提示
-        function showVersionHint(version) {
-            document.getElementById('currentVersion').textContent = version;
-            document.getElementById('versionHint').style.display = 'block';
+        // 显示/隐藏加载提示
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
         }
-        function hideVersionHint() {
-            document.getElementById('versionHint').style.display = 'none';
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
         }
 
-        // 解析哈希 - 简化版本
+        // 解析哈希
         function parseHash() {
             const hash = window.location.hash.replace(/^#\//, '');
             const parts = hash.split('/').filter(Boolean);
             
             let version = 'latest';
-            let language = 'zh-CN';
+            let language = CONFIG.defaultLanguage;
             
             if (parts.length >= 2) {
                 version = parts[0];
@@ -85,29 +81,43 @@
             } else if (parts.length === 1) {
                 if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
                     language = parts[0];
+                    version = 'latest';
+                } else if (parts[0] === 'latest' || parts[0] === 'v2.8.4.5' || parts[0] === 'v2.8.3.5') {
+                    version = parts[0];
                 }
             }
             
             return { version, language };
         }
 
-        // 构建哈希 - 确保格式正确
+        // 构建哈希
         function buildHash(version, language) {
             return `#/${version}/${language}/`;
         }
 
-        // 获取实际版本
-        function getActualVersion(version) {
+        // 获取实际版本路径
+        function getActualVersionPath(version) {
             return version === 'latest' ? CONFIG.latestVersion : version;
         }
 
-        // 初始化Docsify - 简化配置
+        // 初始化Docsify
         function initDocsify(version, language) {
-            const actualVersion = getActualVersion(version);
+            const actualVersion = getActualVersionPath(version);
             const basePath = `./${actualVersion}/${language}/`;
+            
+            console.log('初始化Docsify:', { version, actualVersion, language, basePath });
+            
+            // 销毁之前的Docsify实例（如果存在）
+            if (currentDocsify) {
+                const app = document.getElementById('app');
+                if (app) {
+                    app.innerHTML = ''; // 清空内容
+                }
+            }
             
             window.$docsify = {
                 name: `EdgeLink ${actualVersion} ${language === 'zh-CN' ? '文档' : 'Documentation'}`,
+                repo: '',
                 loadSidebar: true,
                 subMaxLevel: 2,
                 auto2top: true,
@@ -121,80 +131,71 @@
                 },
                 alias: {
                     '/.*/_sidebar.md': '/_sidebar.md'
-                }
+                },
+                routerMode: 'hash',
+                executeScript: true
             };
+            
+            currentDocsify = { version, language };
+            
+            // 手动触发Docsify重新渲染
+            if (window.Docsify) {
+                setTimeout(() => {
+                    if (window.Docsify.instances && window.Docsify.instances.length > 0) {
+                        window.Docsify.instances[0].$resetEvents();
+                    }
+                }, 100);
+            }
         }
 
         // 更新UI
         function updateUI(version, language) {
             document.getElementById('version').value = version;
             document.getElementById('language').value = language;
-            
-            if (version !== 'latest') {
-                showVersionHint(version);
-            } else {
-                hideVersionHint();
-            }
         }
 
-        // 安全导航 - 防止循环
-        function safeNavigate(version, language) {
-            if (navigationLock) return;
-            
-            navigationLock = true;
+        // 安全导航
+        function navigateTo(version, language) {
             const targetHash = buildHash(version, language);
             
             // 只有在哈希不同时才导航
             if (window.location.hash !== targetHash) {
                 window.location.hash = targetHash;
+            } else {
+                // 哈希相同，但需要重新初始化
+                handleRouteChange(version, language);
             }
-            
-            setTimeout(() => {
-                navigationLock = false;
-            }, 100);
         }
 
-        // 处理路由 - 核心修复
-        function handleRouting() {
-            if (navigationLock) return;
+        // 处理路由变化
+        function handleRouteChange(version, language) {
+            showLoading();
             
-            const newState = parseHash();
-            const targetHash = buildHash(newState.version, newState.language);
-            
-            // 检查是否需要重定向
-            if (window.location.hash !== targetHash) {
-                safeNavigate(newState.version, newState.language);
-                return;
-            }
-            
-            // 检查状态是否变化
-            if (newState.version === currentState.version && 
-                newState.language === currentState.language) {
-                return; // 状态未变化
-            }
-            
-            // 更新状态
-            currentState = newState;
+            console.log('路由变化:', { version, language });
             
             // 更新UI
-            updateUI(newState.version, newState.language);
+            updateUI(version, language);
             
             // 重新初始化Docsify
-            initDocsify(newState.version, newState.language);
+            initDocsify(version, language);
+            
+            // 隐藏加载提示
+            setTimeout(hideLoading, 500);
         }
 
         // 切换版本/语言
         function switchVersionLang() {
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
-            safeNavigate(version, language);
+            navigateTo(version, language);
         }
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始状态
+            console.log('页面初始化开始');
+            
+            // 解析初始路由
             const initialState = parseHash();
-            currentState = initialState;
             
             // 更新UI
             updateUI(initialState.version, initialState.language);
@@ -206,25 +207,54 @@
             document.getElementById('version').addEventListener('change', switchVersionLang);
             document.getElementById('language').addEventListener('change', switchVersionLang);
             
-            // 设置默认路由
-            if (!window.location.hash) {
-                window.location.hash = '#/latest/zh-CN/';
+            isInitialized = true;
+            hideLoading();
+            
+            console.log('页面初始化完成');
+        });
+
+        // 哈希变化处理
+        window.addEventListener('hashchange', function() {
+            if (!isInitialized) return;
+            
+            const newState = parseHash();
+            const currentHash = window.location.hash;
+            const expectedHash = buildHash(newState.version, newState.language);
+            
+            console.log('哈希变化:', { 
+                currentHash, 
+                expectedHash,
+                newState 
+            });
+            
+            // 检查是否需要处理
+            if (currentHash === expectedHash) {
+                handleRouteChange(newState.version, newState.language);
             }
         });
 
-        // 哈希变化处理 - 简化版本
-        let hashChangeTimer;
-        window.addEventListener('hashchange', function() {
-            clearTimeout(hashChangeTimer);
-            hashChangeTimer = setTimeout(handleRouting, 50);
+        // 默认路由
+        if (!window.location.hash) {
+            window.location.hash = '#/latest/zh-CN/';
+        }
+
+        // Docsify准备就绪事件
+        window.addEventListener('docsify-ready', function() {
+            console.log('Docsify准备就绪');
+            hideLoading();
         });
     </script>
     
-    <!-- 预加载Docsify库 -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/docsify@4" as="script">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js" as="script">
-    
+    <!-- Docsify库 -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    
+    <!-- 添加错误处理 -->
+    <script>
+        window.addEventListener('error', function(e) {
+            console.error('页面错误:', e.error);
+            document.getElementById('loading').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
