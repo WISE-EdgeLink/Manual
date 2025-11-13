@@ -58,6 +58,8 @@
             defaultLanguage: 'zh-CN'
         };
 
+        let isNavigating = false;
+
         // 显示/隐藏版本提示
         function showVersionHint(version) {
             document.getElementById('currentVersion').textContent = version;
@@ -96,19 +98,16 @@
 
         // 初始化Docsify配置
         function initDocsifyConfig(actualVersion, language) {
-            // 关键：使用相对路径，不依赖basePath
             const basePath = `./${actualVersion}/${language}/`;
             
-            console.log('Docsify配置:', { basePath, actualVersion, language });
-            
             window.$docsify = {
-                name: 'EdgeLink Documentation',
+                name: `EdgeLink ${actualVersion} ${language === 'zh-CN' ? '文档' : 'Documentation'}`,
                 repo: '',
                 loadSidebar: true,
                 subMaxLevel: 2,
                 auto2top: true,
                 basePath: basePath,
-                relativePath: true, // 关键：使用相对路径
+                relativePath: true,
                 homepage: 'README.md',
                 notFoundPage: 'README.md',
                 search: {
@@ -118,40 +117,37 @@
                 alias: {
                     '/.*/_sidebar.md': '/_sidebar.md'
                 },
-                // 关键：使用哈希路由
                 routerMode: 'hash'
             };
         }
 
         // 处理路由重定向
         function handleRouting() {
-            const { displayVersion, actualVersion, language } = parseHash();
-            const currentHash = window.location.hash;
+            if (isNavigating) return;
             
-            // 期望的哈希路径
+            const { displayVersion, actualVersion, language } = parseHash();
             const expectedHash = buildHash(displayVersion, language);
             
             // 检查是否需要重定向
-            if (!currentHash || currentHash !== expectedHash) {
-                console.log('需要重定向:', { from: currentHash, to: expectedHash });
+            if (window.location.hash !== expectedHash) {
+                isNavigating = true;
                 window.location.hash = expectedHash;
-                return { displayVersion, actualVersion, language, redirected: true };
+                setTimeout(() => { isNavigating = false; }, 100);
+                return { redirected: true };
             }
             
-            return { displayVersion, actualVersion, language, redirected: false };
+            return { redirected: false, displayVersion, actualVersion, language };
         }
 
         // 切换版本/语言
         function switchVersionLang() {
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
-            
-            const actualVersion = version === 'latest' ? CONFIG.latestVersion : version;
             const newHash = buildHash(version, language);
             
-            console.log('切换版本语言:', { version, language, actualVersion, newHash });
-            
-            window.location.hash = newHash;
+            if (window.location.hash !== newHash) {
+                window.location.hash = newHash;
+            }
         }
 
         // 更新UI状态
@@ -168,49 +164,29 @@
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面初始化开始');
+            const routing = handleRouting();
             
-            try {
-                // 1. 处理路由
-                const routing = handleRouting();
-                const { displayVersion, actualVersion, language } = routing;
-                
-                console.log('初始化参数:', { displayVersion, actualVersion, language });
-                
-                // 2. 更新UI控件
+            if (!routing.redirected) {
+                const { displayVersion, actualVersion, language } = parseHash();
                 updateUI(displayVersion, actualVersion, language);
-                
-                // 3. 初始化Docsify配置
                 initDocsifyConfig(actualVersion, language);
                 
-                // 4. 绑定事件
                 document.getElementById('version').addEventListener('change', switchVersionLang);
                 document.getElementById('language').addEventListener('change', switchVersionLang);
-                
-                console.log('页面初始化完成');
-                
-            } catch (error) {
-                console.error('页面初始化错误:', error);
             }
         });
 
         // 哈希变化处理
         window.addEventListener('hashchange', function() {
-            console.log('哈希变化:', window.location.hash);
-            
             const { displayVersion, actualVersion, language } = parseHash();
-            
-            // 更新UI
             updateUI(displayVersion, actualVersion, language);
-            
-            // 重新初始化Docsify
             initDocsifyConfig(actualVersion, language);
         });
 
-        // Docsify准备就绪事件
-        window.addEventListener('docsify-ready', function() {
-            console.log('Docsify准备就绪');
-        });
+        // 默认路由
+        if (!window.location.hash) {
+            window.location.hash = '#/latest/zh-CN/';
+        }
     </script>
     
     <!-- Docsify库 -->
