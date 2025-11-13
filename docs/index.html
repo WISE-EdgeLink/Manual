@@ -117,7 +117,7 @@
         // 初始化Docsify配置 - 关键修复：包含仓库路径
         function initDocsifyConfig(actualVersion, language) {
             // 关键修复：包含仓库名的basePath
-            const basePath = `/${CONFIG.repoName}/docs/${actualVersion}/${language}/`;
+            const basePath = `/${CONFIG.repoName}/${actualVersion}/${language}/`;
             
             console.log('Docsify配置:', { basePath, actualVersion, language });
             
