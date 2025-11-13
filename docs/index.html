@@ -8,23 +8,13 @@
     <style>
         .selectors { position: fixed; top: 10px; right: 20px; background: white; padding: 10px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; }
         .selectors select { margin: 0 5px; padding: 4px; }
-        .loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 20px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1001; }
-        .version-hint { 
-            position: fixed; 
-            top: 50px; 
-            right: 20px; 
-            background: #f8f9fa; 
-            padding: 5px 10px; 
-            border-radius: 3px; 
-            font-size: 12px; 
-            color: #666;
-            z-index: 999;
-        }
+        .loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .version-hint { position: fixed; top: 50px; right: 20px; background: #f0f0f0; padding: 5px 10px; border-radius: 3px; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">加载中...</div>
-    <div class="version-hint" id="versionHint" style="display: none;">当前版本: <span id="currentVersion"></span></div>
+    <div class="version-hint" id="versionHint" style="display: none;">版本: <span id="currentVersion"></span></div>
     
     <div class="selectors">
         <select id="version">
@@ -40,49 +30,42 @@
     <div id="app"></div>
 
     <script>
-        // 配置 - 必须在Docsify加载前定义
         const CONFIG = {
             latestVersion: 'v2.8.4.5',
             defaultLanguage: 'zh-CN'
         };
 
-        // 显示/隐藏元素
         function showLoading() { document.getElementById('loading').style.display = 'block'; }
         function hideLoading() { document.getElementById('loading').style.display = 'none'; }
-        function showVersionHint(version) { 
-            document.getElementById('currentVersion').textContent = version; 
-            document.getElementById('versionHint').style.display = 'block'; 
-        }
-        function hideVersionHint() { document.getElementById('versionHint').style.display = 'none'; }
 
-        // 简化的路径解析
-        function parsePath() {
+        function getCurrentVersionLang() {
             const path = window.location.pathname;
             const parts = path.split('/').filter(Boolean);
             
-            let displayVersion = 'latest';
-            let actualVersion = CONFIG.latestVersion;
-            let language = CONFIG.defaultLanguage;
+            let version = 'latest';
+            let lang = CONFIG.defaultLanguage;
             
-            // 简化路径解析逻辑
             if (parts.length >= 2) {
-                displayVersion = parts[0];
-                language = parts[1];
-            } else if (parts.length === 1) {
-                if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
-                    language = parts[0];
-                }
+                version = parts[0];
+                lang = parts[1];
             }
             
-            actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
+            const actualVersion = version === 'latest' ? CONFIG.latestVersion : version;
             
-            return { displayVersion, actualVersion, language };
+            // 显示版本提示
+            if (version !== 'latest') {
+                document.getElementById('currentVersion').textContent = actualVersion;
+                document.getElementById('versionHint').style.display = 'block';
+            }
+            
+            return { version, actualVersion, lang };
         }
 
-        // 初始化Docsify配置
-        function initDocsifyConfig(actualVersion, language) {
-            // 关键修改：使用相对路径，避免复杂的basePath配置
-            const basePath = `docs/${actualVersion}/${language}/`;
+        function initDocsify() {
+            showLoading();
+            
+            const { version, actualVersion, lang } = getCurrentVersionLang();
+            const basePath = `docs/${actualVersion}/${lang}/`;
             
             window.$docsify = {
                 name: 'EdgeLink',
@@ -90,86 +73,38 @@
                 subMaxLevel: 2,
                 auto2top: true,
                 basePath: basePath,
-                relativePath: true,  // 使用相对路径
+                relativePath: true,
                 homepage: 'README.md',
                 loadSidebar: '_sidebar.md',
-                notFoundPage: {
-                    '/': 'README.md',
-                    '/zh-CN/': 'README.md',
-                    '/en-US/': 'README.md'
-                },
-                requestHeaders: {
-                    'cache-control': 'no-cache'
-                },
-                search: {
-                    paths: 'auto',
-                    depth: 3,
-                    placeholder: language === 'zh-CN' ? '搜索' : 'Search',
-                    noData: language === 'zh-CN' ? '没有结果' : 'No results'
+                alias: {
+                    '/.*/_sidebar.md': '/_sidebar.md'
                 }
             };
-        }
-
-        // 简化的路径重定向
-        function handleRouting() {
-            const { displayVersion, actualVersion, language } = parsePath();
-            const currentPath = window.location.pathname;
-            
-            // 期望的路径格式
-            const expectedPath = `/${displayVersion}/${language}/`;
-            
-            // 如果当前路径不符合期望，进行重定向
-            if (!currentPath.startsWith(expectedPath)) {
-                const newUrl = expectedPath + (window.location.search || '') + (window.location.hash || '');
-                history.replaceState(null, '', newUrl);
-            }
-            
-            return { displayVersion, actualVersion, language };
-        }
-
-        // 切换版本/语言
-        function switchVersionLang(displayVersion, language) {
-            showLoading();
-            const newUrl = `/${displayVersion}/${language}/`;
-            window.location.href = newUrl;
-        }
-
-        // 页面初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            const { displayVersion, actualVersion, language } = handleRouting();
             
             // 更新UI
-            document.getElementById('version').value = displayVersion;
-            document.getElementById('language').value = language;
-            
-            // 显示版本提示
-            if (displayVersion !== 'latest') {
-                showVersionHint(actualVersion);
-            }
-            
-            // 绑定事件
-            document.getElementById('version').addEventListener('change', function() {
-                switchVersionLang(this.value, document.getElementById('language').value);
-            });
-            
-            document.getElementById('language').addEventListener('change', function() {
-                switchVersionLang(document.getElementById('version').value, this.value);
-            });
-            
-            // 初始化Docsify配置
-            initDocsifyConfig(actualVersion, language);
-            
-            // 3秒后隐藏加载提示
-            setTimeout(hideLoading, 3000);
-        });
+            document.getElementById('version').value = version;
+            document.getElementById('language').value = lang;
+        }
 
-        // Docsify加载完成后隐藏loading
-        window.addEventListener('docsify-ready', function() {
-            hideLoading();
+        // 切换功能
+        function switchVersionLang() {
+            const version = document.getElementById('version').value;
+            const lang = document.getElementById('language').value;
+            window.location.href = `/${version}/${lang}/`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDocsify();
+            
+            document.getElementById('version').addEventListener('change', switchVersionLang);
+            document.getElementById('language').addEventListener('change', switchVersionLang);
+            
+            // Docsify加载完成后隐藏loading
+            window.addEventListener('docsify-ready', hideLoading);
+            setTimeout(hideLoading, 5000); // 超时保护
         });
     </script>
     
-    <!-- Docsify库必须在$docsify配置之后加载 -->
     <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.13.1/docsify.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.13.1/plugins/search.min.js"></script>
 </body>
