@@ -58,6 +58,10 @@
             defaultLanguage: 'zh-CN'
         };
 
+        let currentState = {
+            version: 'latest',
+            language: 'zh-CN'
+        };
         let isNavigating = false;
 
         // 显示/隐藏版本提示
@@ -74,31 +78,37 @@
             const hash = window.location.hash.replace(/^#\//, '');
             const parts = hash.split('/').filter(Boolean);
             
-            let displayVersion = 'latest';
-            let actualVersion = CONFIG.latestVersion;
+            let version = 'latest';
             let language = CONFIG.defaultLanguage;
             
             if (parts.length >= 2) {
-                displayVersion = parts[0];
+                version = parts[0];
                 language = parts[1];
-                actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
             } else if (parts.length === 1) {
                 if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
                     language = parts[0];
                 }
             }
             
-            return { displayVersion, actualVersion, language };
+            return { version, language };
         }
 
         // 构建哈希路径
-        function buildHash(displayVersion, language) {
-            return `#/${displayVersion}/${language}/`;
+        function buildHash(version, language) {
+            return `#/${version}/${language}/`;
+        }
+
+        // 获取实际版本路径
+        function getActualVersion(version) {
+            return version === 'latest' ? CONFIG.latestVersion : version;
         }
 
         // 初始化Docsify配置
-        function initDocsifyConfig(actualVersion, language) {
+        function initDocsifyConfig(version, language) {
+            const actualVersion = getActualVersion(version);
             const basePath = `./${actualVersion}/${language}/`;
+            
+            console.log('初始化Docsify:', { version, actualVersion, language, basePath });
             
             window.$docsify = {
                 name: `EdgeLink ${actualVersion} ${language === 'zh-CN' ? '文档' : 'Documentation'}`,
@@ -121,66 +131,100 @@
             };
         }
 
-        // 处理路由重定向
+        // 安全导航
+        function safeNavigate(version, language) {
+            if (isNavigating) return;
+            
+            isNavigating = true;
+            const newHash = buildHash(version, language);
+            
+            console.log('安全导航:', { version, language, newHash });
+            
+            // 只有在哈希确实不同时才导航
+            if (window.location.hash !== newHash) {
+                window.location.hash = newHash;
+            }
+            
+            setTimeout(() => {
+                isNavigating = false;
+            }, 100);
+        }
+
+        // 更新UI状态
+        function updateUI(version, language) {
+            document.getElementById('version').value = version;
+            document.getElementById('language').value = language;
+            
+            if (version !== 'latest') {
+                showVersionHint(version);
+            } else {
+                hideVersionHint();
+            }
+        }
+
+        // 处理路由
         function handleRouting() {
             if (isNavigating) return;
             
-            const { displayVersion, actualVersion, language } = parseHash();
-            const expectedHash = buildHash(displayVersion, language);
+            const newState = parseHash();
             
-            // 检查是否需要重定向
-            if (window.location.hash !== expectedHash) {
-                isNavigating = true;
-                window.location.hash = expectedHash;
-                setTimeout(() => { isNavigating = false; }, 100);
-                return { redirected: true };
+            console.log('路由处理:', { currentState, newState });
+            
+            // 检查状态是否变化
+            if (newState.version === currentState.version && 
+                newState.language === currentState.language) {
+                return; // 状态未变化，不处理
             }
             
-            return { redirected: false, displayVersion, actualVersion, language };
+            // 更新状态
+            currentState = newState;
+            
+            // 更新UI
+            updateUI(newState.version, newState.language);
+            
+            // 重新初始化Docsify
+            initDocsifyConfig(newState.version, newState.language);
         }
 
         // 切换版本/语言
         function switchVersionLang() {
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
-            const newHash = buildHash(version, language);
             
-            if (window.location.hash !== newHash) {
-                window.location.hash = newHash;
-            }
-        }
-
-        // 更新UI状态
-        function updateUI(displayVersion, actualVersion, language) {
-            document.getElementById('version').value = displayVersion;
-            document.getElementById('language').value = language;
+            console.log('切换版本语言:', { version, language });
             
-            if (displayVersion !== 'latest') {
-                showVersionHint(actualVersion);
-            } else {
-                hideVersionHint();
-            }
+            safeNavigate(version, language);
         }
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            const routing = handleRouting();
+            console.log('页面初始化开始');
             
-            if (!routing.redirected) {
-                const { displayVersion, actualVersion, language } = parseHash();
-                updateUI(displayVersion, actualVersion, language);
-                initDocsifyConfig(actualVersion, language);
-                
-                document.getElementById('version').addEventListener('change', switchVersionLang);
-                document.getElementById('language').addEventListener('change', switchVersionLang);
-            }
+            // 初始路由处理
+            const initialState = parseHash();
+            currentState = initialState;
+            
+            // 更新UI
+            updateUI(initialState.version, initialState.language);
+            
+            // 初始化Docsify
+            initDocsifyConfig(initialState.version, initialState.language);
+            
+            // 绑定事件
+            document.getElementById('version').addEventListener('change', switchVersionLang);
+            document.getElementById('language').addEventListener('change', switchVersionLang);
+            
+            console.log('页面初始化完成');
         });
 
-        // 哈希变化处理
+        // 哈希变化处理 - 添加防抖
+        let hashChangeTimer;
         window.addEventListener('hashchange', function() {
-            const { displayVersion, actualVersion, language } = parseHash();
-            updateUI(displayVersion, actualVersion, language);
-            initDocsifyConfig(actualVersion, language);
+            clearTimeout(hashChangeTimer);
+            hashChangeTimer = setTimeout(() => {
+                console.log('哈希变化:', window.location.hash);
+                handleRouting();
+            }, 50);
         });
 
         // 默认路由
