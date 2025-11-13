@@ -6,40 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
     <style>
-        .selectors { 
-            position: fixed; 
-            top: 10px; 
-            right: 20px; 
-            background: white; 
-            padding: 10px; 
-            border-radius: 4px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-            z-index: 1000; 
+        .selectors {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            z-index: 1000;
         }
-        .selectors select { 
-            margin: 0 5px; 
-            padding: 4px; 
+        .selectors select {
+            margin: 0 5px;
+            padding: 4px;
         }
-        .loading { 
-            display: none; 
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(255,255,255,0.9); 
-            padding: 20px; 
-            border-radius: 4px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
-            z-index: 1001; 
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background: rgba(255,255,255,.9);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.2);
+            z-index: 1001;
         }
-        .version-hint { 
-            position: fixed; 
-            top: 50px; 
-            right: 20px; 
-            background: #f8f9fa; 
-            padding: 5px 10px; 
-            border-radius: 3px; 
-            font-size: 12px; 
+        .version-hint {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
             color: #666;
             z-index: 999;
         }
@@ -50,188 +50,113 @@
     <div class="version-hint" id="versionHint" style="display: none;">
         当前版本: <span id="currentVersion"></span>
     </div>
-    
+
     <div class="selectors">
-        <select id="version">
-            <option value="latest">最新版本</option>
-            <option value="v2.8.4.5">v2.8.4.5</option>
-            <option value="v2.8.3.5">v2.8.3.5</option>
-        </select>
-        <select id="language">
-            <option value="zh-CN">中文</option>
-            <option value="en-US">English</option>
-        </select>
+        <select id="version"></select>
+        <select id="language"></select>
     </div>
     <div id="app"></div>
 
     <script>
-        // 配置 - 关键修复：包含仓库名
-        const CONFIG = {
-            latestVersion: 'v2.8.4.5',
-            defaultLanguage: 'zh-CN',
-            repoName: 'Manual'  // 关键：仓库名称
+    /**************** 配置 ****************/
+    const CONFIG = {
+        latestVersion: 'v2.8.4.5',
+        defaultLanguage: 'zh-CN',
+        repoName: 'Manual',
+        versions: ['latest', 'v2.8.4.5', 'v2.8.3.5'],
+        languages: [{val: 'zh-CN', name: '中文'}, {val: 'en-US', name: 'English'}]
+    };
+
+    /**************** 工具 ****************/
+    const $ = s => document.querySelector(s);
+    function showLoading() { $('#loading').style.display = 'block'; }
+    function hideLoading() { $('#loading').style.display = 'none'; }
+    function showVersionHint(v) {
+        $('#currentVersion').textContent = v;
+        $('#versionHint').style.display = 'block';
+    }
+    function hideVersionHint() { $('#versionHint').style.display = 'none'; }
+
+    /**************** 解析 hash ****************/
+    function parseHash() {
+        const parts = (window.location.hash || '#/latest/zh-CN/')
+                      .replace(/^#\//, '').replace(/\/$/, '').split('/').filter(Boolean);
+
+        let ver = 'latest', lang = CONFIG.defaultLanguage;
+        if (parts.length >= 2) {
+            ver = parts[0]; lang = parts[1];
+        } else if (parts.length === 1) {
+            if (CONFIG.languages.map(l=>l.val).includes(parts[0])) lang = parts[0];
+            else ver = parts[0];
+        }
+        return {
+            displayVersion: ver,
+            actualVersion: ver === 'latest' ? CONFIG.latestVersion : ver,
+            language: lang
         };
+    }
 
-        // 显示/隐藏元素
-        function showLoading() { document.getElementById('loading').style.display = 'block'; }
-        function hideLoading() { document.getElementById('loading').style.display = 'none'; }
-        function showVersionHint(version) { 
-            document.getElementById('currentVersion').textContent = version; 
-            document.getElementById('versionHint').style.display = 'block'; 
-        }
-        function hideVersionHint() { document.getElementById('versionHint').style.display = 'none'; }
+    /**************** 构建下拉 ****************/
+    function fillSelectors() {
+        const vSel = $('#version'), lSel = $('#language');
+        vSel.innerHTML = CONFIG.versions.map(v =>
+            `<option value="${v}">${v === 'latest' ? '最新版本' : v}</option>`).join('');
+        lSel.innerHTML = CONFIG.languages.map(l =>
+            `<option value="${l.val}">${l.name}</option>`).join('');
+    }
 
-        // 路径解析 - 关键修复：处理仓库名
-        function parsePath() {
-            const path = window.location.pathname;
-            const parts = path.split('/').filter(Boolean);
-            
-            console.log('路径解析:', { path, parts });
-            
-            let displayVersion = 'latest';
-            let actualVersion = CONFIG.latestVersion;
-            let language = CONFIG.defaultLanguage;
-            
-            // 处理仓库名
-            let startIndex = 0;
-            if (parts.length > 0 && parts[0] === CONFIG.repoName) {
-                startIndex = 1; // 跳过仓库名
+    /**************** 切换 ****************/
+    function switchVersionLang() {
+        showLoading();
+        const ver = $('#version').value, lang = $('#language').value;
+        const url = `/#/${ver}/${lang}/`;
+        setTimeout(() => { window.location.href = url; }, 100);
+    }
+
+    /**************** 初始化 Docsify ****************/
+    function initDocsify(lang) {
+        window.$docsify = {
+            name: 'EdgeLink Documentation',
+            repo: '',
+            routerMode: 'hash',
+            loadSidebar: true,
+            subMaxLevel: 2,
+            auto2top: true,
+            homepage: 'README.md',
+            loadSidebar: '_sidebar.md',
+            notFoundPage: 'README.md',
+            search: {
+                depth: 3,
+                placeholder: lang === 'zh-CN' ? '搜索' : 'Search'
+            },
+            alias: {
+                '/.*/_sidebar.md': '/_sidebar.md'
             }
-            
-            const relevantParts = parts.slice(startIndex);
-            console.log('相关部分:', relevantParts);
-            
-            if (relevantParts.length >= 2) {
-                displayVersion = relevantParts[0];
-                language = relevantParts[1];
-                actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
-            } else if (relevantParts.length === 1) {
-                if (relevantParts[0] === 'zh-CN' || relevantParts[0] === 'en-US') {
-                    language = relevantParts[0];
-                }
-            }
-            
-            return { displayVersion, actualVersion, language };
-        }
+        };
+    }
 
-        // 初始化Docsify配置 - 关键修复：包含仓库路径
-        function initDocsifyConfig(actualVersion, language) {
-            // 关键修复：包含仓库名的basePath
-            const basePath = `/${CONFIG.repoName}/${actualVersion}/${language}/`;
-            
-            console.log('Docsify配置:', { basePath, actualVersion, language });
-            
-            // 关键：必须在Docsify库加载前配置
-            window.$docsify = {
-                name: 'EdgeLink Documentation',
-                routerMode: 'hash'
-                repo: '',
-                loadSidebar: true,
-                subMaxLevel: 2,
-                auto2top: true,
-                basePath: basePath,
-                relativePath: false,
-                homepage: 'README.md',
-                loadSidebar: '_sidebar.md',
-                notFoundPage: 'README.md',
-                search: {
-                    depth: 3,
-                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
-                },
-                alias: {
-                    '/.*/_sidebar.md': '/_sidebar.md'
-                }
-            };
-        }
+    /**************** 主入口 ****************/
+    document.addEventListener('DOMContentLoaded', () => {
+        showLoading();
+        try {
+            fillSelectors();
+            const {displayVersion, actualVersion, language} = parseHash();
 
-        // 路径重定向 - 关键修复：包含仓库名
-        function handleRouting() {
-            const { displayVersion, actualVersion, language } = parsePath();
-            const currentPath = window.location.pathname;
-            
-            // 关键修复：期望路径包含仓库名
-            const expectedPath = `/${CONFIG.repoName}/${displayVersion}/${language}/`;
-            
-            console.log('路由检查:', {
-                currentPath,
-                expectedPath,
-                displayVersion,
-                actualVersion,
-                language
-            });
-            
-            // 检查是否需要重定向
-            if (currentPath !== expectedPath && currentPath !== expectedPath.replace(/\/$/, '')) {
-                const newUrl = expectedPath + (window.location.search || '') + (window.location.hash || '');
-                console.log('执行重定向到:', newUrl);
-                history.replaceState(null, '', newUrl);
-                return { displayVersion, actualVersion, language, redirected: true };
-            }
-            
-            return { displayVersion, actualVersion, language, redirected: false };
-        }
+            $('#version').value = displayVersion;
+            $('#language').value = language;
+            if (displayVersion !== 'latest') showVersionHint(actualVersion);
 
-        // 切换版本/语言 - 关键修复：包含仓库名
-        function switchVersionLang() {
-            showLoading();
-            
-            const version = document.getElementById('version').value;
-            const language = document.getElementById('language').value;
-            
-            // 关键修复：新URL包含仓库名
-            const newUrl = `/#/${CONFIG.repoName}/${version}/${language}/`;
-            
-            console.log('切换版本语言:', { version, language, newUrl });
-            
-            setTimeout(() => {
-                window.location.href = newUrl;
-            }, 100);
-        }
+            initDocsify(language);
+            $('#version').addEventListener('change', switchVersionLang);
+            $('#language').addEventListener('change', switchVersionLang);
+        } catch (e) { console.error(e); }
+        setTimeout(hideLoading, 300);
+    });
 
-        // 页面初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面初始化开始');
-            showLoading();
-            
-            try {
-                // 1. 处理路由
-                const routing = handleRouting();
-                const { displayVersion, actualVersion, language } = routing;
-                
-                // 2. 更新UI
-                document.getElementById('version').value = displayVersion;
-                document.getElementById('language').value = language;
-                
-                // 3. 显示版本提示
-                if (displayVersion !== 'latest') {
-                    showVersionHint(actualVersion);
-                }
-                
-                // 4. 初始化Docsify配置
-                initDocsifyConfig(actualVersion, language);
-                
-                // 5. 绑定事件
-                document.getElementById('version').addEventListener('change', switchVersionLang);
-                document.getElementById('language').addEventListener('change', switchVersionLang);
-                
-                console.log('初始化完成');
-                
-            } catch (error) {
-                console.error('初始化错误:', error);
-            }
-            
-            // 超时保护
-            setTimeout(hideLoading, 3000);
-        });
-
-        // Docsify事件
-        window.addEventListener('docsify-ready', function() {
-            console.log('Docsify准备就绪');
-            hideLoading();
-        });
+    window.addEventListener('docsify-ready', hideLoading);
     </script>
-    
-    <!-- 关键：Docsify库必须在$docsify配置之后加载 -->
+
+    <!-- 加载 Docsify -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
 </body>
