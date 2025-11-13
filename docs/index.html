@@ -52,11 +52,13 @@
     <div id="app"></div>
 
     <script>
+        // 配置
         const CONFIG = {
             latestVersion: 'v2.8.4.5',
             defaultLanguage: 'zh-CN'
         };
 
+        // 显示/隐藏版本提示
         function showVersionHint(version) {
             document.getElementById('currentVersion').textContent = version;
             document.getElementById('versionHint').style.display = 'block';
@@ -65,44 +67,45 @@
             document.getElementById('versionHint').style.display = 'none';
         }
 
-        // 更新：处理两种访问方式
+        // 从哈希解析版本和语言
         function parseHash() {
             const hash = window.location.hash.replace(/^#\//, '');
             const parts = hash.split('/').filter(Boolean);
             
             let displayVersion = 'latest';
-            let actualVersion = CONFIG.latestVersion;
+            let actualVersion = CONFIG.latestVersion; // 映射到实际版本
             let language = CONFIG.defaultLanguage;
             
             if (parts.length >= 2) {
-                // 格式: /版本/语言/
                 displayVersion = parts[0];
                 language = parts[1];
+                // 关键修复：latest映射到实际版本
                 actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
-            } else if (parts.length === 1) {
-                // 格式: /语言/ (直接访问版本目录时)
-                if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
-                    language = parts[0];
-                }
             }
             
             return { displayVersion, actualVersion, language };
         }
 
+        // 构建哈希路径
         function buildHash(displayVersion, language) {
             return `#/${displayVersion}/${language}/`;
         }
 
+        // 初始化Docsify配置 - 关键修复
         function initDocsifyConfig(actualVersion, language) {
+            // 关键修复：使用实际版本路径，不是latest
             const basePath = `./${actualVersion}/${language}/`;
             
+            console.log('初始化Docsify配置:', { basePath, actualVersion, language });
+            
+            // 关键修复：正确的变量名 $docsify（不是$docxify）
             window.$docsify = {
                 name: 'EdgeLink Documentation',
                 repo: '',
                 loadSidebar: true,
                 subMaxLevel: 2,
                 auto2top: true,
-                basePath: basePath,
+                basePath: basePath, // 使用实际版本路径
                 relativePath: true,
                 homepage: 'README.md',
                 notFoundPage: 'README.md',
@@ -117,13 +120,16 @@
             };
         }
 
+        // 切换版本/语言
         function switchVersionLang() {
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
+            
             const newHash = buildHash(version, language);
             window.location.hash = newHash;
         }
 
+        // 更新UI状态
         function updateUI(displayVersion, actualVersion, language) {
             document.getElementById('version').value = displayVersion;
             document.getElementById('language').value = language;
@@ -135,35 +141,54 @@
             }
         }
 
+        // 处理路由重定向
         function handleRouting() {
             const { displayVersion, actualVersion, language } = parseHash();
+            const currentHash = window.location.hash;
             const expectedHash = buildHash(displayVersion, language);
             
-            if (window.location.hash !== expectedHash) {
+            // 检查是否需要重定向
+            if (currentHash !== expectedHash) {
                 window.location.hash = expectedHash;
                 return { redirected: true };
             }
             
+            // 更新UI
             updateUI(displayVersion, actualVersion, language);
-            initDocsifyConfig(actualVersion, language);
+            
+            // 初始化Docsify配置
+            initDocsifyConfig(actualVersion, language); // 传入实际版本
             
             return { redirected: false };
         }
 
+        // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面初始化开始');
+            
             const routing = handleRouting();
             
             if (!routing.redirected) {
+                // 绑定事件
                 document.getElementById('version').addEventListener('change', switchVersionLang);
                 document.getElementById('language').addEventListener('change', switchVersionLang);
+                
+                console.log('页面初始化完成');
             }
         });
 
+        // 哈希变化处理
         window.addEventListener('hashchange', function() {
             handleRouting();
         });
+
+        // Docsify准备就绪事件
+        window.addEventListener('docsify-ready', function() {
+            console.log('Docsify准备就绪');
+        });
     </script>
     
+    <!-- Docsify库必须在$docsify配置之后加载 -->
     <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
 </body>
