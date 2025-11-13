@@ -58,6 +58,14 @@
             defaultLanguage: 'zh-CN'
         };
 
+        // 状态管理 - 防止循环跳转
+        let currentState = {
+            version: 'latest',
+            language: 'zh-CN',
+            path: ''
+        };
+        let isSwitching = false;
+
         // 显示/隐藏版本提示
         function showVersionHint(version) {
             document.getElementById('currentVersion').textContent = version;
@@ -67,7 +75,7 @@
             document.getElementById('versionHint').style.display = 'none';
         }
 
-        // 从哈希解析版本和语言
+        // 从哈希解析版本和语言 - 修复版
         function parseHash() {
             const hash = window.location.hash.replace(/^#\//, '');
             const parts = hash.split('/').filter(Boolean);
@@ -75,29 +83,48 @@
             let displayVersion = 'latest';
             let actualVersion = CONFIG.latestVersion;
             let language = CONFIG.defaultLanguage;
+            let path = '';
             
             if (parts.length >= 2) {
                 displayVersion = parts[0];
                 language = parts[1];
                 actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
+                
+                // 提取路径部分（如果有）
+                if (parts.length > 2) {
+                    path = parts.slice(2).join('/');
+                }
             }
             
-            return { displayVersion, actualVersion, language };
+            return { displayVersion, actualVersion, language, path, hash };
         }
 
-        // 构建哈希路径
-        function buildHash(displayVersion, language) {
+        // 构建哈希路径 - 修复版（包含当前路径）
+        function buildHash(displayVersion, language, path = '') {
+            if (path) {
+                return `#/${displayVersion}/${language}/${path}`;
+            }
             return `#/${displayVersion}/${language}/`;
         }
 
-        // 初始化Docsify配置 - 精准修复侧边栏问题
+        // 检查是否需要切换 - 防止不必要的跳转
+        function shouldSwitch(newState) {
+            return newState.version !== currentState.version || 
+                   newState.language !== currentState.language;
+        }
+
+        // 初始化Docsify配置 - 简化版
         function initDocsifyConfig(actualVersion, language) {
             const basePath = `./${actualVersion}/${language}/`;
             
             console.log('初始化Docsify:', { basePath, actualVersion, language });
             
+            if (window.$docsify) {
+                delete window.$docsify;
+            }
+            
             window.$docsify = {
-                name: 'EdgeLink Documentation',
+                name: language === 'zh-CN' ? 'EdgeLink 文档' : 'EdgeLink Documentation',
                 repo: '',
                 loadSidebar: true,
                 subMaxLevel: 2,
@@ -115,66 +142,40 @@
                 },
                 routerMode: 'hash',
                 
-                // 关键修复：确保侧边栏正确加载
-                loadSidebar: '_sidebar.md',
+                // 关键：修复侧边栏链接问题
+                relativePath: true,
                 
-                // 添加侧边栏加载钩子
+                // 简化钩子，避免循环
                 hooks: {
-                    'each': function(content, next) {
-                        // 确保侧边栏内容正确加载
+                    'beforeEach': function(content, next) {
+                        // 确保链接路径正确
                         next(content);
-                    },
-                    'doneEach': function() {
-                        console.log('页面内容已更新，侧边栏应该同步更新');
                     }
                 }
             };
         }
 
-        // 精准刷新侧边栏
-        function refreshSidebar() {
-            console.log('刷新侧边栏');
-            
-            // 方法1: 通过Docsify API刷新侧边栏
-            if (window.Docsify && window.Docsify.dom) {
-                const app = document.getElementById('app');
-                if (app && app.__vue__) {
-                    // 触发Vue实例更新
-                    app.__vue__.$forceUpdate();
-                }
-            }
-            
-            // 方法2: 重新加载侧边栏文件
-            const { actualVersion, language } = parseHash();
-            const sidebarPath = `./${actualVersion}/${language}/_sidebar.md`;
-            
-            // 使用fetch重新加载侧边栏，避免缓存
-            fetch(sidebarPath + '?t=' + Date.now())
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('侧边栏文件不存在: ' + sidebarPath);
-                    }
-                    return response.text();
-                })
-                .then(content => {
-                    console.log('侧边栏内容已重新加载');
-                })
-                .catch(error => {
-                    console.warn('侧边栏加载警告:', error.message);
-                });
-        }
-
-        // 切换版本/语言
+        // 切换版本/语言 - 修复版
         function switchVersionLang() {
+            if (isSwitching) return;
+            
+            isSwitching = true;
+            
             const version = document.getElementById('version').value;
             const language = document.getElementById('language').value;
+            const { path } = currentState;
             
             const actualVersion = version === 'latest' ? CONFIG.latestVersion : version;
-            const newHash = buildHash(version, language);
+            const newHash = buildHash(version, language, path);
             
-            console.log('切换:', { version, language, actualVersion });
+            console.log('主动切换:', { version, language, path, newHash });
             
+            // 直接更新哈希，不触发额外逻辑
             window.location.hash = newHash;
+            
+            setTimeout(() => {
+                isSwitching = false;
+            }, 100);
         }
 
         // 更新UI状态
@@ -189,53 +190,72 @@
             }
         }
 
-        // 页面初始化 - 简化版本
+        // 处理路由 - 核心修复函数
+        function handleRouteChange() {
+            if (isSwitching) return;
+            
+            const newState = parseHash();
+            console.log('路由变化:', newState);
+            
+            // 检查是否真的需要切换
+            if (!shouldSwitch(newState) && newState.path === currentState.path) {
+                console.log('无需切换，路径相同');
+                return;
+            }
+            
+            // 更新当前状态
+            currentState = newState;
+            
+            // 更新UI
+            updateUI(newState.displayVersion, newState.actualVersion, newState.language);
+            
+            // 重新初始化Docsify（仅当语言或版本变化时）
+            if (shouldSwitch(newState)) {
+                console.log('需要重新初始化Docsify');
+                initDocsifyConfig(newState.actualVersion, newState.language);
+                
+                // 标记为切换中，防止循环
+                isSwitching = true;
+                setTimeout(() => {
+                    isSwitching = false;
+                }, 300);
+            }
+        }
+
+        // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
             console.log('页面初始化开始');
             
-            // 1. 解析当前哈希
-            const { displayVersion, actualVersion, language } = parseHash();
+            // 初始状态
+            currentState = parseHash();
             
-            // 2. 更新UI
-            updateUI(displayVersion, actualVersion, language);
+            // 更新UI
+            updateUI(currentState.displayVersion, currentState.actualVersion, currentState.language);
             
-            // 3. 初始化Docsify配置
-            initDocsifyConfig(actualVersion, language);
+            // 初始化Docsify配置
+            initDocsifyConfig(currentState.actualVersion, currentState.language);
             
-            // 4. 绑定事件
+            // 绑定事件
             document.getElementById('version').addEventListener('change', switchVersionLang);
             document.getElementById('language').addEventListener('change', switchVersionLang);
             
             console.log('页面初始化完成');
         });
 
-        // 哈希变化处理 - 简化版本
+        // 哈希变化处理 - 修复循环问题
         let hashChangeTimer;
         window.addEventListener('hashchange', function() {
-            console.log('哈希变化:', window.location.hash);
-            
-            // 防抖处理，避免频繁刷新
+            // 防抖处理
             clearTimeout(hashChangeTimer);
             hashChangeTimer = setTimeout(() => {
-                const { displayVersion, actualVersion, language } = parseHash();
-                
-                // 更新UI
-                updateUI(displayVersion, actualVersion, language);
-                
-                // 重新配置Docsify
-                initDocsifyConfig(actualVersion, language);
-                
-                // 延迟刷新侧边栏
-                setTimeout(refreshSidebar, 300);
-            }, 100);
+                handleRouteChange();
+            }, 50);
         });
 
         // Docsify准备就绪事件
         window.addEventListener('docsify-ready', function() {
             console.log('Docsify准备就绪');
-            
-            // 确保侧边栏正确显示
-            setTimeout(refreshSidebar, 200);
+            isSwitching = false;
         });
     </script>
     
