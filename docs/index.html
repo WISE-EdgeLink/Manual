@@ -19,13 +19,40 @@
         .selectors select {
             margin: 0 5px;
             padding: 4px;
+            font-size: 14px;
+        }
+        .version-hint {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #666;
+            z-index: 999;
+        }
+        @media (max-width: 768px) {
+            .selectors {
+                top: 5px;
+                right: 5px;
+                padding: 8px;
+            }
+            .selectors select {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="version-hint" id="versionHint" style="display: none;">
+        当前版本: <span id="currentVersion"></span>
+    </div>
+    
     <div class="selectors">
         <select id="version">
-            <option value="v2.8.4.5">最新版本 (v2.8.4.5)</option>
+            <option value="latest">最新版本</option>
+            <option value="v2.8.4.5">v2.8.4.5</option>
             <option value="v2.8.3.5">v2.8.3.5</option>
         </select>
         <select id="language">
@@ -33,82 +60,230 @@
             <option value="en-US">English</option>
         </select>
     </div>
+    
     <div id="app"></div>
 
     <script>
-        // 简单配置
-        const VERSIONS = {
-            current: 'v2.8.4.5'
+        // GitHub Pages 兼容配置
+        const CONFIG = {
+            latestVersion: 'v2.8.4.5',
+            defaultLanguage: 'zh-CN',
+            basePath: window.location.pathname.replace(/\/[^\/]*$/, '') // 自动获取基础路径
         };
 
-        // 直接页面跳转（最可靠的方式）
-        function navigateToPage(version, language) {
-            // 直接跳转到对应版本的页面
-            window.location.href = `./${version}/index.html#/${language}/`;
+        let currentState = { version: 'latest', language: 'zh-CN' };
+        let navigationLock = false;
+
+        // 显示/隐藏版本提示
+        function showVersionHint(version) {
+            const hint = document.getElementById('versionHint');
+            if (hint) {
+                document.getElementById('currentVersion').textContent = version;
+                hint.style.display = 'block';
+            }
+        }
+        
+        function hideVersionHint() {
+            const hint = document.getElementById('versionHint');
+            if (hint) hint.style.display = 'none';
         }
 
-        // 初始化当前页面
-        function initCurrentPage() {
-            // 解析当前路径确定版本
-            const pathParts = window.location.pathname.split('/');
-            let currentVersion = VERSIONS.current;
-            let currentLanguage = 'zh-CN';
+        // GitHub Pages 兼容的路径解析
+        function parseHash() {
+            const hash = window.location.hash.replace(/^#\//, '');
+            const parts = hash.split('/').filter(Boolean);
             
-            // 从URL路径获取版本信息
-            for (let part of pathParts) {
-                if (part.startsWith('v2.8.')) {
-                    currentVersion = part;
-                    break;
+            let version = 'latest';
+            let language = CONFIG.defaultLanguage;
+            
+            if (parts.length >= 2) {
+                version = parts[0];
+                language = parts[1];
+            } else if (parts.length === 1) {
+                if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
+                    language = parts[0];
                 }
             }
             
-            // 从哈希获取语言信息
-            const hash = window.location.hash.replace(/^#\//, '');
-            const hashParts = hash.split('/').filter(Boolean);
-            if (hashParts.length > 0 && (hashParts[0] === 'zh-CN' || hashParts[0] === 'en-US')) {
-                currentLanguage = hashParts[0];
-            }
+            return { version, language };
+        }
+
+        // 构建哈希路径
+        function buildHash(version, language) {
+            return `#/${version}/${language}/`;
+        }
+
+        // 获取实际版本路径
+        function getActualVersion(version) {
+            return version === 'latest' ? CONFIG.latestVersion : version;
+        }
+
+        // GitHub Pages 兼容的Docsify配置
+        function initDocsifyConfig(version, language) {
+            const actualVersion = getActualVersion(version);
             
-            // 更新UI
-            document.getElementById('version').value = currentVersion;
-            document.getElementById('language').value = currentLanguage;
+            // 使用相对路径，兼容GitHub Pages
+            const basePath = `./${actualVersion}/${language}/`;
             
-            // 初始化Docsify配置
             window.$docsify = {
-                name: `EdgeLink ${currentVersion} ${currentLanguage === 'zh-CN' ? '文档' : 'Documentation'}`,
+                name: `EdgeLink ${actualVersion} ${language === 'zh-CN' ? '文档' : 'Documentation'}`,
+                repo: '',
                 loadSidebar: true,
                 subMaxLevel: 2,
                 auto2top: true,
-                basePath: `./${currentLanguage}/`,
+                basePath: basePath,
                 relativePath: true,
                 homepage: 'README.md',
                 notFoundPage: 'README.md',
                 search: {
                     depth: 3,
-                    placeholder: currentLanguage === 'zh-CN' ? '搜索' : 'Search'
-                }
+                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
+                },
+                alias: {
+                    '/.*/_sidebar.md': '/_sidebar.md'
+                },
+                // GitHub Pages 需要明确的路径配置
+                routerMode: 'hash',
+                executeScript: true
             };
-            
-            // 绑定切换事件
-            document.getElementById('version').addEventListener('change', function() {
-                const version = this.value;
-                const language = document.getElementById('language').value;
-                navigateToPage(version, language);
-            });
-            
-            document.getElementById('language').addEventListener('change', function() {
-                const language = this.value;
-                const version = document.getElementById('version').value;
-                // 语言切换在当前页面处理
-                window.location.hash = `#/${language}/`;
-                location.reload(); // 简单刷新以应用新配置
-            });
         }
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', initCurrentPage);
+        // 安全导航
+        function safeNavigate(version, language) {
+            if (navigationLock) return;
+            
+            navigationLock = true;
+            const targetHash = buildHash(version, language);
+            
+            // 只有在哈希不同时才导航
+            if (window.location.hash !== targetHash) {
+                window.location.hash = targetHash;
+            }
+            
+            setTimeout(() => {
+                navigationLock = false;
+            }, 100);
+        }
+
+        // 更新UI
+        function updateUI(version, language) {
+            const versionSelect = document.getElementById('version');
+            const languageSelect = document.getElementById('language');
+            
+            if (versionSelect) versionSelect.value = version;
+            if (languageSelect) languageSelect.value = language;
+            
+            if (version !== 'latest') {
+                showVersionHint(version);
+            } else {
+                hideVersionHint();
+            }
+        }
+
+        // 处理路由
+        function handleRouting() {
+            if (navigationLock) return;
+            
+            const newState = parseHash();
+            const targetHash = buildHash(newState.version, newState.language);
+            
+            // 检查是否需要重定向
+            if (window.location.hash !== targetHash) {
+                safeNavigate(newState.version, newState.language);
+                return;
+            }
+            
+            // 检查状态是否变化
+            if (newState.version === currentState.version && 
+                newState.language === currentState.language) {
+                return;
+            }
+            
+            // 更新状态
+            currentState = newState;
+            
+            // 更新UI
+            updateUI(newState.version, newState.language);
+            
+            // 重新初始化Docsify
+            initDocsifyConfig(newState.version, newState.language);
+        }
+
+        // 切换版本/语言
+        function switchVersionLang() {
+            const version = document.getElementById('version').value;
+            const language = document.getElementById('language').value;
+            safeNavigate(version, language);
+        }
+
+        // GitHub Pages 兼容的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始状态
+            const initialState = parseHash();
+            currentState = initialState;
+            
+            // 更新UI
+            updateUI(initialState.version, initialState.language);
+            
+            // 初始化Docsify
+            initDocsifyConfig(initialState.version, initialState.language);
+            
+            // 绑定事件
+            const versionSelect = document.getElementById('version');
+            const languageSelect = document.getElementById('language');
+            
+            if (versionSelect) {
+                versionSelect.addEventListener('change', switchVersionLang);
+            }
+            if (languageSelect) {
+                languageSelect.addEventListener('change', switchVersionLang);
+            }
+            
+            // GitHub Pages 默认路由
+            if (!window.location.hash) {
+                window.location.hash = '#/latest/zh-CN/';
+            }
+        });
+
+        // 哈希变化处理
+        window.addEventListener('hashchange', function() {
+            setTimeout(handleRouting, 50);
+        });
+
+        // 错误处理 - GitHub Pages 需要
+        window.addEventListener('error', function(e) {
+            console.error('Page error:', e.error);
+        });
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+    <!-- 使用本地或CDN资源 -->
+    <script>
+        // 检查是否在GitHub Pages环境
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        
+        // 动态加载资源
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback;
+            document.body.appendChild(script);
+        }
+        
+        function loadStyle(href) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            document.head.appendChild(link);
+        }
+        
+        // 加载Docsify
+        document.addEventListener('DOMContentLoaded', function() {
+            // 使用CDN资源
+            loadStyle('https://cdn.jsdelivr.net/npm/docsify@4/themes/vue.css');
+            loadScript('https://cdn.jsdelivr.net/npm/docsify@4', function() {
+                loadScript('https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js');
+            });
+        });
+    </script>
 </body>
 </html>
