@@ -83,9 +83,6 @@
             } else if (parts.length === 1) {
                 if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
                     language = parts[0];
-                } else if (parts[0] === 'latest' || parts[0] === 'v2.8.4.5' || parts[0] === 'v2.8.3.5') {
-                    displayVersion = parts[0];
-                    actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
                 }
             }
             
@@ -97,9 +94,41 @@
             return `#/${displayVersion}/${language}/`;
         }
 
-        // 初始化Docsify配置
+        // 强制刷新侧边栏 - 关键修复
+        function forceReloadSidebar() {
+            console.log('强制刷新侧边栏');
+            
+            // 方法1: 清除侧边栏缓存
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.innerHTML = '';
+                console.log('已清空侧边栏内容');
+            }
+            
+            // 方法2: 重新加载侧边栏
+            setTimeout(() => {
+                if (window.$docsify && window.$docsify.loadSidebar) {
+                    // 强制重新加载侧边栏
+                    const sidebarPath = window.$docsify.basePath + '_sidebar.md';
+                    console.log('重新加载侧边栏:', sidebarPath);
+                    
+                    // 使用时间戳避免缓存
+                    fetch(sidebarPath + '?t=' + Date.now())
+                        .then(response => response.text())
+                        .then(content => {
+                            const app = document.getElementById('app');
+                            if (app && app.__vue__) {
+                                // Vue实例方式刷新
+                                app.__vue__.$forceUpdate();
+                            }
+                        })
+                        .catch(error => console.error('侧边栏加载失败:', error));
+                }
+            }, 300);
+        }
+
+        // 初始化Docsify配置 - 关键修复侧边栏问题
         function initDocsifyConfig(actualVersion, language) {
-            // 关键：使用相对路径
             const basePath = `./${actualVersion}/${language}/`;
             
             console.log('Docsify配置:', { basePath, actualVersion, language });
@@ -121,35 +150,51 @@
                 notFoundPage: 'README.md',
                 search: {
                     depth: 3,
-                    placeholder: language === 'zh-CN' ? '搜索' : 'Search',
-                    noData: language === 'zh-CN' ? '没有找到结果' : 'No results found'
+                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
                 },
                 alias: {
                     '/.*/_sidebar.md': '/_sidebar.md'
                 },
-                routerMode: 'hash'
+                routerMode: 'hash',
+                
+                // 关键：侧边栏配置优化
+                loadSidebar: '_sidebar.md',
+                maxLevel: 4,
+                
+                // 添加侧边栏加载回调
+                hooks: {
+                    ready: function() {
+                        console.log('Docsify准备就绪，侧边栏已加载');
+                    },
+                    'page:load': function() {
+                        console.log('页面加载完成，刷新侧边栏');
+                        setTimeout(forceReloadSidebar, 100);
+                    }
+                }
             };
-            
-            // 强制重新初始化Docsify
-            reinitializeDocsify();
         }
 
-        // 重新初始化Docsify
-        function reinitializeDocsify() {
+        // 完全重新初始化Docsify
+        function reinitializeDocsify(actualVersion, language) {
+            console.log('完全重新初始化Docsify');
+            
+            // 清空应用容器
             const app = document.getElementById('app');
             if (app) {
                 app.innerHTML = '';
             }
             
-            // 重新创建Docsify实例
-            if (window.Docsify) {
-                setTimeout(() => {
-                    // 手动触发Docsify重新初始化
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/docsify@4';
-                    document.body.appendChild(script);
-                }, 100);
-            }
+            // 重新初始化配置
+            initDocsifyConfig(actualVersion, language);
+            
+            // 重新加载Docsify
+            setTimeout(() => {
+                if (window.Docsify) {
+                    // 手动触发Docsify初始化
+                    const event = new Event('DOMContentLoaded');
+                    document.dispatchEvent(event);
+                }
+            }, 200);
         }
 
         // 处理路由重定向
@@ -157,10 +202,8 @@
             const { displayVersion, actualVersion, language } = parseHash();
             const currentHash = window.location.hash;
             
-            // 期望的哈希路径
             const expectedHash = buildHash(displayVersion, language);
             
-            // 检查是否需要重定向
             if (!currentHash || currentHash !== expectedHash) {
                 console.log('需要重定向:', { from: currentHash, to: expectedHash });
                 window.location.hash = expectedHash;
@@ -223,7 +266,7 @@
             }
         });
 
-        // 哈希变化处理
+        // 哈希变化处理 - 关键修复侧边栏刷新
         window.addEventListener('hashchange', function() {
             console.log('哈希变化:', window.location.hash);
             
@@ -232,13 +275,19 @@
             // 更新UI
             updateUI(displayVersion, actualVersion, language);
             
-            // 重新初始化Docsify
-            initDocsifyConfig(actualVersion, language);
+            // 完全重新初始化Docsify（包括侧边栏）
+            reinitializeDocsify(actualVersion, language);
+            
+            // 额外强制刷新侧边栏
+            setTimeout(forceReloadSidebar, 500);
         });
 
         // Docsify准备就绪事件
         window.addEventListener('docsify-ready', function() {
             console.log('Docsify准备就绪');
+            
+            // 确保侧边栏正确加载
+            setTimeout(forceReloadSidebar, 300);
         });
     </script>
     
