@@ -150,7 +150,7 @@
             const currentPath = window.location.pathname;
             
             // 关键修复：期望路径包含仓库名
-            const expectedPath = `/#/${CONFIG.repoName}/${displayVersion}/${language}/`;
+            const expectedPath = `/${CONFIG.repoName}/${displayVersion}/${language}/`;
             
             console.log('路由检查:', {
                 currentPath,
@@ -179,7 +179,7 @@
             const language = document.getElementById('language').value;
             
             // 关键修复：新URL包含仓库名
-            const newUrl = `/${CONFIG.repoName}/${version}/${language}/`;
+            const newUrl = `/#/${CONFIG.repoName}/${version}/${language}/`;
             
             console.log('切换版本语言:', { version, language, newUrl });
             
