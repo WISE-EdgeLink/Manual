@@ -83,6 +83,9 @@
             } else if (parts.length === 1) {
                 if (parts[0] === 'zh-CN' || parts[0] === 'en-US') {
                     language = parts[0];
+                } else if (parts[0] === 'latest' || parts[0] === 'v2.8.4.5' || parts[0] === 'v2.8.3.5') {
+                    displayVersion = parts[0];
+                    actualVersion = displayVersion === 'latest' ? CONFIG.latestVersion : displayVersion;
                 }
             }
             
@@ -96,10 +99,15 @@
 
         // 初始化Docsify配置
         function initDocsifyConfig(actualVersion, language) {
-            // 关键：使用相对路径，不依赖basePath
+            // 关键：使用相对路径
             const basePath = `./${actualVersion}/${language}/`;
             
             console.log('Docsify配置:', { basePath, actualVersion, language });
+            
+            // 清除之前的Docsify实例
+            if (window.$docsify) {
+                delete window.$docsify;
+            }
             
             window.$docsify = {
                 name: 'EdgeLink Documentation',
@@ -108,19 +116,40 @@
                 subMaxLevel: 2,
                 auto2top: true,
                 basePath: basePath,
-                relativePath: true, // 关键：使用相对路径
+                relativePath: true,
                 homepage: 'README.md',
                 notFoundPage: 'README.md',
                 search: {
                     depth: 3,
-                    placeholder: language === 'zh-CN' ? '搜索' : 'Search'
+                    placeholder: language === 'zh-CN' ? '搜索' : 'Search',
+                    noData: language === 'zh-CN' ? '没有找到结果' : 'No results found'
                 },
                 alias: {
                     '/.*/_sidebar.md': '/_sidebar.md'
                 },
-                // 关键：使用哈希路由
                 routerMode: 'hash'
             };
+            
+            // 强制重新初始化Docsify
+            reinitializeDocsify();
+        }
+
+        // 重新初始化Docsify
+        function reinitializeDocsify() {
+            const app = document.getElementById('app');
+            if (app) {
+                app.innerHTML = '';
+            }
+            
+            // 重新创建Docsify实例
+            if (window.Docsify) {
+                setTimeout(() => {
+                    // 手动触发Docsify重新初始化
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/docsify@4';
+                    document.body.appendChild(script);
+                }, 100);
+            }
         }
 
         // 处理路由重定向
